@@ -1,7 +1,8 @@
 # TÀI LIỆU YÊU CẦU SẢN PHẨM (PRD)
-## Mắt Bão ServiceWatch (Incident Bridge)
+## ServiceWatch (Incident Bridge)
 
-* **Tên sản phẩm:** Mắt Bão ServiceWatch (Incident Bridge)
+* **Tên sản phẩm:** ServiceWatch (Incident Bridge)
+* **Định vị giải pháp:** Nền tảng tự động điều phối & cầu nối xử lý sự cố hạ tầng số (Tối ưu cho hệ sinh thái Cloud/Domain Mắt Bão)
 * **Nhánh đề tài / Nhóm chủ đề:** Website / Kỹ thuật
 * **Bảng thi đề xuất:** Bảng Kỹ thuật (Technical Support / Developers / System Admin)
 * **Nền tảng triển khai:** Vibe Host (`vibehost.matbao.ai`)

@@ -1,10 +1,24 @@
-// --- MẮT BÃO SERVICEWATCH CLIENT APP ---
+// --- SERVICEWATCH FRIENDLY & ENTERPRISE CLIENT SCRIPT ---
 
 let currentChaosMode = false;
 let currentChaosType = 'dns_servfail';
 let allAssets = [];
 
+// Reusable Pure Vector SVG Icons (No Emojis)
+const ICONS = {
+  globe: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  website: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+  hosting: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>`,
+  email: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+  ssl: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>`,
+  alert: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  send: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>`,
+  fileText: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`
+};
+
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   initTabs();
   initChaosControls();
   fetchDashboard();
@@ -12,15 +26,48 @@ document.addEventListener('DOMContentLoaded', () => {
   loadPlaybook();
   loadAuditLogs();
 
-  // Polling chu kỳ 3.5 giây để cập nhật trạng thái thời gian thực
+  // Polling mỗi 3.5 giây để cập nhật trực tiếp trạng thái
   setInterval(() => {
     fetchDashboard(false);
   }, 3500);
 });
 
-// 1. Quản lý chuyển Tab
+// 1. Quản lý Theme Sáng / Tối
+function initTheme() {
+  const current = localStorage.getItem('servicewatch_theme') || 'light';
+  applyTheme(current);
+
+  const toggleBtn = document.getElementById('themeToggleBtn');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const active = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = active === 'light' ? 'dark' : 'light';
+      applyTheme(next);
+      localStorage.setItem('servicewatch_theme', next);
+    });
+  }
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const sunIcon = document.getElementById('themeIconSun');
+  const moonIcon = document.getElementById('themeIconMoon');
+  const label = document.getElementById('themeToggleLabel');
+
+  if (theme === 'dark') {
+    if (sunIcon) sunIcon.style.display = 'inline-block';
+    if (moonIcon) moonIcon.style.display = 'none';
+    if (label) label.innerText = 'Sáng';
+  } else {
+    if (sunIcon) sunIcon.style.display = 'none';
+    if (moonIcon) moonIcon.style.display = 'inline-block';
+    if (label) label.innerText = 'Tối';
+  }
+}
+
+// 2. Quản lý chuyển Tab
 function initTabs() {
-  const tabs = document.querySelectorAll('.nav-tab');
+  const tabs = document.querySelectorAll('.nav-item');
   tabs.forEach(tab => {
     tab.addEventListener('click', () => {
       const targetId = tab.dataset.tab;
@@ -30,22 +77,21 @@ function initTabs() {
 }
 
 function switchTab(targetId) {
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
 
-  const activeTabBtn = document.querySelector(`.nav-tab[data-tab="${targetId}"]`);
+  const activeTabBtn = document.querySelector(`.nav-item[data-tab="${targetId}"]`);
   const activePane = document.getElementById(targetId);
 
   if (activeTabBtn) activeTabBtn.classList.add('active');
   if (activePane) activePane.classList.add('active');
 
-  // Nạp dữ liệu đặc thù của tab
   if (targetId === 'tab-assets') loadAssets();
   if (targetId === 'tab-playbook') loadPlaybook();
   if (targetId === 'tab-logs') loadAuditLogs();
 }
 
-// 2. Chế độ giả lập sự cố (Chaos Mode)
+// 3. Chế độ kiểm thử Chaos Studio
 function initChaosControls() {
   const toggleBtn = document.getElementById('toggleChaosBtn');
   const typeSelect = document.getElementById('chaosTypeSelect');
@@ -54,32 +100,29 @@ function initChaosControls() {
   toggleBtn.addEventListener('click', async () => {
     const selectedType = typeSelect.value;
     try {
-      const res = await fetch('/api/chaos/toggle', {
+      await fetch('/api/chaos/toggle', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chaos_type: selectedType })
       });
-      const data = await res.json();
       fetchDashboard(true);
     } catch (err) {
-      console.error('Lỗi khi toggle chaos:', err);
+      console.error('Lỗi khi kích hoạt Chaos:', err);
     }
   });
 
   triggerBtn.addEventListener('click', async () => {
     triggerBtn.disabled = true;
-    triggerBtn.innerText = '⏳ Đang quét...';
     try {
       await fetch('/api/probes/run', { method: 'POST' });
       await fetchDashboard(true);
     } finally {
       triggerBtn.disabled = false;
-      triggerBtn.innerText = '🔄 Quét Ngay';
     }
   });
 }
 
-// 3. Fetch Dashboard & State Machine
+// 4. Nạp dữ liệu Dashboard
 async function fetchDashboard(forceRender = false) {
   try {
     const res = await fetch('/api/dashboard');
@@ -100,20 +143,20 @@ function updateChaosUI(sys) {
   currentChaosType = sys.chaos_type;
 
   const btn = document.getElementById('toggleChaosBtn');
-  const btnText = document.getElementById('chaosBtnText');
-  const pulse = document.getElementById('chaosPulse');
+  const label = document.getElementById('chaosBtnLabel');
+  const indicator = document.getElementById('chaosIndicator');
   const typeSelect = document.getElementById('chaosTypeSelect');
 
   typeSelect.value = sys.chaos_type;
 
   if (sys.chaos_mode) {
     btn.classList.add('active');
-    btnText.innerText = '🟢 Dừng Lỗi -> Chờ Phục Hồi';
-    pulse.classList.add('active-chaos');
+    label.innerText = 'Dừng Mô Phỏng';
+    indicator.className = 'status-indicator danger';
   } else {
     btn.classList.remove('active');
-    btnText.innerText = '⚡ Kích Hoạt Giả Lập Lỗi';
-    pulse.classList.remove('active-chaos');
+    label.innerText = 'Giả Lập Lỗi';
+    indicator.className = 'status-indicator';
   }
 }
 
@@ -132,34 +175,84 @@ function updateKPIs(data) {
 
   kpiHealthEl.innerText = `${healthPct}%`;
   if (healthPct === 100) {
-    kpiHealthEl.className = 'kpi-value text-success';
-    kpiHealthSub.innerText = 'Tất cả dịch vụ hoạt động bình thường';
+    kpiHealthEl.className = 'metric-value status-text-healthy';
+    kpiHealthSub.innerText = 'Toàn bộ dịch vụ sẵn sàng';
   } else {
-    kpiHealthEl.className = 'kpi-value text-danger';
-    kpiHealthSub.innerText = `${degraded} tài sản đang bị ảnh hưởng liên đới`;
+    kpiHealthEl.className = 'metric-value status-text-critical';
+    kpiHealthSub.innerText = `${degraded} dịch vụ bị gián đoạn liên đới`;
   }
 
-  // Incident alert bar
+  // Update Business Health Shield (Dành cho Quản lý & Chủ shop)
+  const shield = document.getElementById('businessShield');
+  const shieldTitle = document.getElementById('shieldTitle');
+  const shieldDesc = document.getElementById('shieldDesc');
+  const shieldIconBadge = document.getElementById('shieldIconBadge');
+  const pillWeb = document.getElementById('pillWeb');
+  const pillMail = document.getElementById('pillMail');
+  const pillSsl = document.getElementById('pillSsl');
+
+  if (shield) {
+    if (openCount === 0) {
+      shield.className = 'business-shield-card healthy';
+      shieldIconBadge.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>`;
+      shieldTitle.innerText = 'Hạ Tầng Doanh Nghiệp Đang Hoạt Động An Toàn 100%';
+      shieldDesc.innerText = 'Website bán hàng, hòm thư nhận đơn và bảo mật số của bạn đang mở cửa 24/7 đón khách hàng ổn định.';
+      if (pillWeb) {
+        pillWeb.className = 'quick-pill ok';
+        pillWeb.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Web Bán Hàng: Hoạt động</span>`;
+      }
+      if (pillMail) {
+        pillMail.className = 'quick-pill ok';
+        pillMail.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Email Công Ty: Thông suốt</span>`;
+      }
+      if (pillSsl) {
+        pillSsl.className = 'quick-pill ok';
+        pillSsl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Bảo Mật SSL: An toàn</span>`;
+      }
+    } else {
+      const inc = data.activeIncidents[0];
+      shield.className = 'business-shield-card critical';
+      shieldIconBadge.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+      shieldTitle.innerText = `Cảnh Báo: Phát Hiện Gián Đoạn Kéo Theo Sập Liên Đới!`;
+      shieldDesc.innerText = `${inc ? inc.title : 'Sự cố kết nối nghiêm trọng'}. Website và Hộp thư nhận đơn có thể đang bị gián đoạn. Đã chuẩn bị sẵn phiếu hỗ trợ gửi Mắt Bão.`;
+      if (pillWeb) {
+        pillWeb.className = 'quick-pill fail';
+        pillWeb.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Web Bán Hàng: Gián đoạn</span>`;
+      }
+      if (pillMail) {
+        pillMail.className = 'quick-pill fail';
+        pillMail.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Email Công Ty: Mất kết nối</span>`;
+      }
+      if (pillSsl) {
+        pillSsl.className = 'quick-pill fail';
+        pillSsl.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Bảo Mật SSL: Cảnh báo</span>`;
+      }
+    }
+  }
+
+  // Incident active banner
   const alertBar = document.getElementById('activeIncidentAlert');
-  const badge = document.getElementById('incidentCountBadge');
+  const navBadge = document.getElementById('navIncidentBadge');
 
   if (openCount > 0) {
-    alertBar.style.display = 'flex';
-    badge.style.display = 'inline-block';
-    badge.innerText = openCount;
+    alertBar.style.display = 'block';
+    navBadge.style.display = 'inline-block';
+    navBadge.innerText = openCount;
+
     const inc = data.activeIncidents[0];
     document.getElementById('alertTitle').innerText = inc.title;
-    document.getElementById('alertDesc').innerText = `Nguyên nhân: ${inc.root_cause_type} · Đơn vị chịu trách nhiệm: ${inc.responsible_provider}`;
+    document.getElementById('alertDesc').innerText = `Nguyên nhân: ${inc.root_cause_type} · Đơn vị tiếp nhận hỗ trợ: ${inc.responsible_provider} · Đã soạn xong Ticket`;
   } else {
     alertBar.style.display = 'none';
-    badge.style.display = 'none';
+    navBadge.style.display = 'none';
   }
 }
 
-// 4. Render Bản đồ Phụ thuộc (Dependency Map)
+// 5. Render Bản đồ phụ thuộc (Dependency Topology)
 async function renderTopology(data) {
   const treeContainer = document.getElementById('topologyTree');
-  const mapPill = document.getElementById('mapPill');
+  const mapBadge = document.getElementById('mapStatusBadge');
+  const mapText = document.getElementById('mapStatusText');
 
   if (!allAssets.length) {
     const res = await fetch('/api/assets');
@@ -170,49 +263,63 @@ async function renderTopology(data) {
   const isHealthy = allAssets.every(a => a.status === 'healthy');
 
   if (isHealthy) {
-    mapPill.className = 'status-pill status-healthy';
-    mapPill.innerText = 'Hạ tầng Ổn định';
+    mapBadge.className = 'badge-status badge-healthy';
+    mapText.innerText = 'Hạ Tầng Ổn Định';
   } else {
-    mapPill.className = 'status-pill status-down';
-    mapPill.innerText = 'Phát hiện Sự cố Liên đới';
+    mapBadge.className = 'badge-status badge-down';
+    mapText.innerText = 'Phát Hiện Sập Liên Đới';
   }
 
   let html = '';
   rootAssets.forEach(root => {
     const children = allAssets.filter(a => a.parent_asset_id === root.id);
+
     html += `
-      <div class="tree-root-card">
-        <div class="tree-root-info">
-          <div class="asset-icon">🌐</div>
-          <div class="asset-details">
-            <h4>${root.name} <span class="badge badge-sub">${root.provider_name}</span></h4>
-            <p>Target: <code>${root.target}</code> · Baseline: ${root.baseline_value || 'Chưa cấu hình'}</p>
+      <div class="topology-node-root">
+        <div class="node-main">
+          <div class="node-icon-box">
+            ${ICONS.globe}
+          </div>
+          <div class="node-info">
+            <h4>
+              ${escapeHtml(root.name)} 
+              <span class="node-role-badge">Tên Miền Cửa Ngõ</span>
+              <span class="node-provider-tag">${escapeHtml(root.provider_name)}</span>
+            </h4>
+            <div class="node-meta">Địa chỉ: <code>${escapeHtml(root.target)}</code> · Cấu hình chuẩn: ${escapeHtml(root.baseline_value || 'Chưa thiết lập')}</div>
           </div>
         </div>
         <div>
-          ${renderStatusBadge(root.status)}
+          ${renderBadge(root.status)}
         </div>
       </div>
-      <div class="tree-children">
+      <div class="topology-children-group">
     `;
 
     children.forEach(child => {
-      let icon = '💻';
-      if (child.type === 'email') icon = '✉️';
-      if (child.type === 'ssl') icon = '🔒';
-      if (child.type === 'hosting') icon = '☁️';
+      let icon = ICONS.website;
+      let roleLabel = 'Website Giới Thiệu';
+      if (child.type === 'email') { icon = ICONS.email; roleLabel = 'Hộp Thư Công Ty'; }
+      if (child.type === 'ssl') { icon = ICONS.ssl; roleLabel = 'Khóa Bảo Mật SSL'; }
+      if (child.type === 'hosting') { icon = ICONS.hosting; roleLabel = 'Máy Chủ Cloud'; }
+      if (child.type === 'website') { icon = ICONS.website; roleLabel = 'Website Bán Hàng'; }
 
       html += `
-        <div class="tree-child-card">
-          <div style="display:flex; align-items:center; gap:10px;">
-            <span style="font-size:16px;">${icon}</span>
+        <div class="topology-node-child">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="color:var(--text-tertiary); display:flex;">${icon}</span>
             <div>
-              <strong style="color:#fff; font-size:13px;">${child.name}</strong>
-              <div style="font-size:11px; color:#64748b;">${child.provider_name} · <code>${child.target}</code></div>
+              <div style="font-weight:600; font-size:13.5px; color:var(--text-primary); display:flex; align-items:center; gap:8px;">
+                ${escapeHtml(child.name)}
+                <span class="node-role-badge">${roleLabel}</span>
+              </div>
+              <div style="font-size:12px; color:var(--text-tertiary); font-family:var(--font-mono); margin-top:2px;">
+                Nhà cung cấp: ${escapeHtml(child.provider_name)} · <code>${escapeHtml(child.target)}</code>
+              </div>
             </div>
           </div>
           <div>
-            ${renderStatusBadge(child.status)}
+            ${renderBadge(child.status)}
           </div>
         </div>
       `;
@@ -224,37 +331,43 @@ async function renderTopology(data) {
   treeContainer.innerHTML = html;
 }
 
-function renderStatusBadge(status) {
+function renderBadge(status) {
   if (status === 'healthy') {
-    return `<span class="status-pill status-healthy">● Healthy</span>`;
+    return `<span class="badge-status badge-healthy"><span class="badge-dot"></span>Hoạt động tốt</span>`;
   }
   if (status === 'down') {
-    return `<span class="status-pill status-down">▲ Unreachable</span>`;
+    return `<span class="badge-status badge-down"><span class="badge-dot"></span>Mất kết nối</span>`;
   }
-  return `<span class="status-pill status-degraded">● Degraded</span>`;
+  return `<span class="badge-status badge-degraded"><span class="badge-dot"></span>Chập chờn</span>`;
 }
 
-// 5. Render Live Probes
+// 6. Render Luồng kiểm tra Live Stream
 function renderProbeTable(probes) {
   const tbody = document.getElementById('probeTableBody');
   if (!probes || !probes.length) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#64748b;">Chưa có dữ liệu kiểm tra.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:var(--text-tertiary); padding:20px;">Đang khởi tạo luồng kiểm tra thời gian thực...</td></tr>`;
     return;
   }
 
   tbody.innerHTML = probes.map(p => {
-    const time = new Date(p.checked_at).toLocaleTimeString();
-    const isOk = p.status === 'SUCCESS';
+    const isOk = p.status === 'healthy';
+    const date = new Date(p.created_at);
+    const time = date.toLocaleTimeString();
+
     return `
       <tr>
-        <td class="mono" style="color:#94a3b8;">${time}</td>
-        <td><strong>${p.resolver}</strong></td>
-        <td><code>${p.asset_name}</code></td>
-        <td><span class="badge badge-sub">${p.monitor_type}</span></td>
-        <td class="mono" style="color: ${isOk ? '#00e5bf' : '#ff4d4d'}; font-weight:600;">${p.response_code}</td>
-        <td class="mono">${p.latency_ms}ms</td>
-        <td>${isOk ? '<span class="status-pill status-healthy">PASS</span>' : '<span class="status-pill status-down">FAIL</span>'}</td>
-        <td class="mono" style="font-size:11px; color:#cbd5e1; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(p.raw_log)}">
+        <td class="code-cell" style="color:var(--text-tertiary);">${time}</td>
+        <td><strong>${escapeHtml(p.resolver)}</strong></td>
+        <td><code class="code-cell">${escapeHtml(p.asset_name)}</code></td>
+        <td><span class="node-provider-tag">${escapeHtml(p.monitor_type)}</span></td>
+        <td class="code-cell" style="color: ${isOk ? 'var(--status-emerald)' : 'var(--status-rose)'}; font-weight:700;">${escapeHtml(p.response_code)}</td>
+        <td class="code-cell">${p.latency_ms}ms</td>
+        <td>
+          <span class="badge-status ${isOk ? 'badge-healthy' : 'badge-down'}">
+            <span class="badge-dot"></span>${isOk ? 'Hợp lệ' : 'Lỗi'}
+          </span>
+        </td>
+        <td class="code-cell" style="font-size:11.5px; max-width:280px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${escapeHtml(p.raw_log)}">
           ${escapeHtml(p.raw_log)}
         </td>
       </tr>
@@ -262,7 +375,7 @@ function renderProbeTable(probes) {
   }).join('');
 }
 
-// 6. Incident View & Ticket Bridge
+// 7. Trung tâm Sự cố & Cầu nối Ticket
 async function renderIncidentView(activeIncidents) {
   const container = document.getElementById('incidentViewContainer');
   const res = await fetch('/api/incidents');
@@ -270,10 +383,12 @@ async function renderIncidentView(activeIncidents) {
 
   if (!allIncidents.length) {
     container.innerHTML = `
-      <div style="text-align:center; padding: 40px; color:#94a3b8;">
-        <div style="font-size:48px; margin-bottom:12px;">✅</div>
-        <h3>Không có sự cố nào được ghi nhận</h3>
-        <p style="font-size:13px; color:#64748b; margin-top:6px;">Hệ thống đang hoạt động ổn định. Bạn có thể sử dụng thanh "Mô phỏng sự cố" ở trên cùng để kiểm thử.</p>
+      <div style="text-align:center; padding: 48px 20px; color:var(--text-tertiary);">
+        <div style="margin-bottom:12px; display:inline-flex; padding:14px; border-radius:50%; background:var(--status-emerald-bg); color:var(--status-emerald);">
+          ${ICONS.check}
+        </div>
+        <h4 style="color:var(--text-primary); font-size:16px;">Hạ Tầng Đang Vận Hành An Toàn — Không Có Sự Cố</h4>
+        <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">Tất cả dịch vụ và hòm thư đều đang hoạt động tốt. Bạn có thể bấm nút "Giả Lập Lỗi" ở góc trên để kiểm chứng quy trình tự động.</p>
       </div>
     `;
     return;
@@ -283,68 +398,98 @@ async function renderIncidentView(activeIncidents) {
   const isResolved = latest.status === 'Resolved' || latest.status === 'Closed';
 
   let stateSteps = `
-    <div class="state-breadcrumbs">
-      <div class="step-node done">1. Phát hiện (Detected)</div>
-      <div class="step-arrow">➔</div>
-      <div class="step-node ${latest.status !== 'Suspected' ? 'done' : 'current'}">2. Xác nhận (Confirmed)</div>
-      <div class="step-arrow">➔</div>
-      <div class="step-node ${latest.ticket_status === 'sent' ? 'done' : 'current'}">3. Soạn & Gửi Ticket</div>
-      <div class="step-arrow">➔</div>
-      <div class="step-node ${isResolved ? 'done' : ''}">4. Xác minh Phục hồi (3 Passes)</div>
-      <div class="step-arrow">➔</div>
-      <div class="step-node ${latest.status === 'Closed' ? 'done' : ''}">5. Đóng Sự cố</div>
+    <div class="incident-lifecycle-bar">
+      <div class="step-item done">${ICONS.check} 1. Tự Động Phát Hiện</div>
+      <div class="step-divider">/</div>
+      <div class="step-item ${latest.status !== 'Suspected' ? 'done' : 'active'}">${latest.status !== 'Suspected' ? ICONS.check : '●'} 2. Cô Lập & Tính Tác Động</div>
+      <div class="step-divider">/</div>
+      <div class="step-item ${latest.ticket_status === 'sent' ? 'done' : 'active'}">${latest.ticket_status === 'sent' ? ICONS.check : '●'} 3. Soạn & Gửi Ticket Mắt Bão</div>
+      <div class="step-divider">/</div>
+      <div class="step-item ${isResolved ? 'done' : ''}">${isResolved ? ICONS.check : '○'} 4. Xác Thực Phục Hồi (3 Lượt)</div>
+      <div class="step-divider">/</div>
+      <div class="step-item ${latest.status === 'Closed' ? 'done' : ''}">${latest.status === 'Closed' ? ICONS.check : '○'} 5. Đóng & Xuất Báo Cáo</div>
     </div>
   `;
 
   let ticketActions = '';
   if (latest.ticket_status === 'sent') {
     ticketActions = `
-      <div style="display:flex; align-items:center; gap:12px; background:rgba(0, 229, 191, 0.1); border:1px solid rgba(0, 229, 191, 0.3); padding:10px 16px; border-radius:8px;">
-        <span style="font-size:20px;">📬</span>
+      <div class="ticket-status-card">
+        <span style="color:var(--status-emerald);">${ICONS.check}</span>
         <div>
-          <strong style="color:#00e5bf;">Đã gửi Ticket thành công tới Mắt Bão Support</strong>
-          <div style="font-size:12px; color:#cbd5e1;">Mã phiếu yêu cầu: <code>${latest.external_ticket_id}</code> · Trạng thái: Đang chờ phản hồi SLA</div>
+          <div style="font-weight:700; color:var(--status-emerald-text); font-size:13.5px;">Phiếu Hỗ Trợ Đã Được Gửi Thành Công Sang Kỹ Thuật Mắt Bão</div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">Mã phiếu hỗ trợ: <code>${latest.external_ticket_id}</code> · Kỹ sư trực ban đang tiếp nhận xử lý theo cam kết SLA.</div>
         </div>
       </div>
     `;
   } else {
     ticketActions = `
       <button class="btn btn-primary" onclick="sendTicket(${latest.id})">
-        🚀 Phê Duyệt & Gửi Ticket Khẩn Cấp Tới Mắt Bão
+        ${ICONS.send}
+        <span>Duyệt & Gửi Phiếu Hỗ Trợ Kỹ Thuật Cho Mắt Bão</span>
       </button>
-      <span style="font-size:12px; color:#94a3b8; margin-left:12px;">(Định tuyến chính xác tới đội ngũ chịu trách nhiệm)</span>
+      <span style="font-size:12.5px; color:var(--text-tertiary); margin-left:12px;">(Hệ thống tự động liên kết đúng phòng ban phụ trách: ${escapeHtml(latest.responsible_provider)})</span>
     `;
   }
 
   let reportBtn = '';
   if (latest.post_incident_report) {
     reportBtn = `
-      <button class="btn btn-secondary" onclick="viewReport(${latest.id})">
-        📋 Xem Báo Cáo Hậu Sự Cố (Post-mortem Report)
+      <button class="btn btn-sm btn-secondary" onclick="viewReport(${latest.id})">
+        ${ICONS.fileText}
+        <span>Xem Báo Cáo Phục Hồi</span>
       </button>
     `;
   }
 
+  // Tóm tắt dễ hiểu cho chủ doanh nghiệp non-tech
+  const businessSummaryBox = `
+    <div style="background:var(--bg-subtle); border:1px solid var(--border-default); border-radius:var(--radius-md); padding:16px 20px;">
+      <h5 style="font-size:14px; font-weight:700; color:var(--text-primary); margin-bottom:6px; display:flex; align-items:center; gap:8px;">
+        <span style="color:var(--status-rose);">${ICONS.alert}</span>
+        Tóm Tắt Tác Động Thực Tế (Dành Cho Chủ Doanh Nghiệp & Quản Lý)
+      </h5>
+      <p style="font-size:13px; color:var(--text-secondary); line-height:1.5;">
+        ${latest.business_impact || 'Khách hàng có thể không truy cập được website mua hàng và các email gửi đến công ty bị chậm trễ.'}
+      </p>
+      <div style="display:flex; align-items:center; gap:20px; margin-top:10px; font-size:12px; color:var(--text-tertiary); flex-wrap:wrap;">
+        <span>Đơn vị chịu trách nhiệm: <strong style="color:var(--accent-primary);">${escapeHtml(latest.responsible_provider)}</strong></span>
+        <span>Thời điểm phát hiện: <strong>${new Date(latest.first_detected_at).toLocaleString()}</strong></span>
+        <span>Hỗ trợ khẩn cấp: <strong>1900 1830 (Mắt Bão 24/7)</strong></span>
+      </div>
+    </div>
+  `;
+
   container.innerHTML = `
-    <div class="incident-card">
-      <div class="incident-card-header">
+    <div class="incident-container">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px; flex-wrap:wrap;">
         <div>
-          <span class="status-pill status-${isResolved ? 'healthy' : 'down'}">${latest.severity.toUpperCase()}</span>
-          <span class="status-pill" style="margin-left:6px; background:rgba(255,255,255,0.08);">${latest.status}</span>
-          <h3 style="margin-top:8px; font-size:18px;">${latest.title}</h3>
-          <p style="font-size:12px; color:#94a3b8;">Phát hiện: ${new Date(latest.first_detected_at).toLocaleString()} · Đơn vị chịu trách nhiệm: <strong>${latest.responsible_provider}</strong></p>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="badge-status ${isResolved ? 'badge-healthy' : 'badge-down'}">
+              <span class="badge-dot"></span>Mức độ: ${latest.severity}
+            </span>
+            <span class="node-provider-tag">Trạng thái: ${latest.status}</span>
+          </div>
+          <h4 style="margin-top:8px; font-size:16px; font-weight:700; color:var(--text-primary);">${escapeHtml(latest.title)}</h4>
+          <p style="font-size:12.5px; color:var(--text-tertiary); margin-top:2px;">
+            Mã định danh sự cố: <code>#INC-${latest.id}</code> · Tác động liên đới: Website, Email giao dịch
+          </p>
         </div>
-        <div style="text-align:right;">
+        <div>
           ${reportBtn}
         </div>
       </div>
 
+      ${businessSummaryBox}
+
       ${stateSteps}
 
-      <div style="margin: 16px 0;">
-        <h4 style="font-size:13px; color:#ff9142; margin-bottom:6px;">BẢN THẢO TICKET TỰ ĐỘNG (DRAFT TICKET COMPOSER):</h4>
-        <div class="ticket-box">${escapeHtml(latest.ticket_body)}</div>
-        <div style="margin-top: 12px;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-size:12px; font-weight:700; text-transform:uppercase; color:var(--accent-primary); letter-spacing:0.04em;">Nội Dung Phiếu Hỗ Trợ Đã Chuẩn Bị Sẵn (Draft Ticket Composer)</span>
+        </div>
+        <div class="ticket-composer-box">${escapeHtml(latest.ticket_body)}</div>
+        <div style="margin-top: 16px;">
           ${ticketActions}
         </div>
       </div>
@@ -356,11 +501,9 @@ async function sendTicket(incidentId) {
   try {
     const res = await fetch(`/api/incidents/${incidentId}/send-ticket`, { method: 'POST' });
     const data = await res.json();
-    alert(`🎉 ${data.message}`);
     fetchDashboard(true);
   } catch (err) {
     console.error(err);
-    alert('Lỗi khi gửi ticket.');
   }
 }
 
@@ -368,7 +511,7 @@ async function viewReport(incidentId) {
   try {
     const res = await fetch(`/api/incidents/${incidentId}`);
     const incident = await res.json();
-    document.getElementById('reportBody').innerHTML = `<pre style="font-family:inherit; white-space:pre-wrap;">${escapeHtml(incident.post_incident_report)}</pre>`;
+    document.getElementById('reportBody').innerText = incident.post_incident_report;
     document.getElementById('reportModal').style.display = 'flex';
   } catch (err) {
     console.error(err);
@@ -379,7 +522,7 @@ function closeReportModal() {
   document.getElementById('reportModal').style.display = 'none';
 }
 
-// 7. Sổ tay ứng cứu khẩn cấp (Playbook)
+// 8. Sổ tay ứng cứu khẩn cấp (Playbook)
 async function loadPlaybook() {
   const container = document.getElementById('playbookActionList');
   try {
@@ -390,28 +533,30 @@ async function loadPlaybook() {
       let actionBtn = '';
       if (act.id === 'failover_page') {
         actionBtn = `
-          <button class="btn btn-warning btn-sm" onclick="toggleFailover()">
-            ${playbook.failover_active ? '🔴 Tắt Trang Bảo Trì' : '⚡ Kích Hoạt Trang Bảo Trì Tĩnh'}
+          <button class="btn btn-sm btn-secondary" onclick="toggleFailover()">
+            <span>${playbook.failover_active ? 'Tắt Trang Bảo Trì' : 'Bật Trang Thông Báo Bảo Trì'}</span>
           </button>
         `;
       } else if (act.id === 'dns_snapshot_rollback') {
         actionBtn = `
-          <button class="btn btn-secondary btn-sm" onclick="rollbackDNS()">
-            ⏪ Khôi Phục DNS Baseline
+          <button class="btn btn-sm btn-secondary" onclick="rollbackDNS()">
+            <span>Khôi Phục Bản Ghi DNS Baseline</span>
           </button>
         `;
       }
 
       return `
         <div class="playbook-card">
-          <div class="playbook-card-top">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-              <span class="status-pill status-${act.status === 'ACTIVE' || act.status === 'DISPATCHED' ? 'healthy' : 'degraded'}">${act.status}</span>
-            </div>
-            <h3>${act.title}</h3>
-            <p>${act.description}</p>
-          </div>
           <div>
+            <div class="playbook-header">
+              <h4>${escapeHtml(act.title)}</h4>
+              <span class="badge-status ${act.status === 'ACTIVE' || act.status === 'DISPATCHED' ? 'badge-healthy' : 'badge-degraded'}">
+                <span class="badge-dot"></span>${act.status}
+              </span>
+            </div>
+            <p>${escapeHtml(act.description)}</p>
+          </div>
+          <div style="margin-top:12px;">
             ${actionBtn}
           </div>
         </div>
@@ -424,9 +569,7 @@ async function loadPlaybook() {
 
 async function toggleFailover() {
   try {
-    const res = await fetch('/api/playbook/toggle-failover', { method: 'POST' });
-    const data = await res.json();
-    alert(data.message);
+    await fetch('/api/playbook/toggle-failover', { method: 'POST' });
     loadPlaybook();
     loadAuditLogs();
   } catch (err) {
@@ -435,18 +578,16 @@ async function toggleFailover() {
 }
 
 async function rollbackDNS() {
-  if (!confirm('Bạn có chắc muốn khôi phục lại toàn bộ bản ghi DNS về Baseline an toàn gần nhất không?')) return;
+  if (!confirm('Xác nhận khôi phục cấu hình bản ghi DNS về Baseline an toàn gần nhất?')) return;
   try {
-    const res = await fetch('/api/playbook/rollback-dns', { method: 'POST' });
-    const data = await res.json();
-    alert(data.message);
+    await fetch('/api/playbook/rollback-dns', { method: 'POST' });
     loadAuditLogs();
   } catch (err) {
     console.error(err);
   }
 }
 
-// 8. CRUD Tài sản (Assets Table)
+// 9. Quản lý Tài sản số (Assets CRUD CSDL Thật)
 async function loadAssets() {
   const tbody = document.getElementById('assetTableBody');
   const parentSelect = document.getElementById('assetParentId');
@@ -455,22 +596,22 @@ async function loadAssets() {
     const res = await fetch('/api/assets');
     allAssets = await res.json();
 
-    parentSelect.innerHTML = `<option value="">-- Không có (Tài sản gốc) --</option>` +
-      allAssets.map(a => `<option value="${a.id}">${a.name} (${a.type})</option>`).join('');
+    parentSelect.innerHTML = `<option value="">-- Dịch vụ gốc (Không phụ thuộc dịch vụ khác) --</option>` +
+      allAssets.map(a => `<option value="${a.id}">${escapeHtml(a.name)} (${a.type})</option>`).join('');
 
     tbody.innerHTML = allAssets.map(a => `
       <tr>
-        <td class="mono">#${a.id}</td>
+        <td class="code-cell" style="color:var(--text-tertiary);">#${a.id}</td>
         <td><strong>${escapeHtml(a.name)}</strong></td>
-        <td><span class="badge badge-sub">${a.type}</span></td>
-        <td class="mono"><code>${escapeHtml(a.target)}</code></td>
+        <td><span class="node-provider-tag">${a.type}</span></td>
+        <td class="code-cell"><code>${escapeHtml(a.target)}</code></td>
         <td>${escapeHtml(a.provider_name)}</td>
-        <td>${a.parent_name ? escapeHtml(a.parent_name) : '<span style="color:#64748b;">(Gốc)</span>'}</td>
-        <td style="font-size:11px; color:#94a3b8;">${escapeHtml(a.baseline_value || 'N/A')}</td>
-        <td>${renderStatusBadge(a.status)}</td>
-        <td>
-          <button class="btn btn-secondary btn-sm" onclick="openEditAssetModal(${a.id})">Sửa</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteAsset(${a.id})">Xóa</button>
+        <td style="color:var(--text-secondary); font-size:12px;">${a.parent_name ? escapeHtml(a.parent_name) : '<span style="color:var(--text-tertiary);">Dịch vụ Gốc</span>'}</td>
+        <td class="code-cell" style="font-size:11px; color:var(--text-tertiary);">${escapeHtml(a.baseline_value || 'N/A')}</td>
+        <td>${renderBadge(a.status)}</td>
+        <td style="text-align: right;">
+          <button class="btn btn-sm btn-secondary" onclick="openEditAssetModal(${a.id})" style="padding:3px 8px;">Sửa</button>
+          <button class="btn btn-sm btn-danger-subtle" onclick="deleteAsset(${a.id})" style="padding:3px 8px; margin-left:4px;">Xóa</button>
         </td>
       </tr>
     `).join('');
@@ -480,7 +621,7 @@ async function loadAssets() {
 }
 
 function openAddAssetModal() {
-  document.getElementById('modalTitle').innerText = 'Thêm Tài Sản Mới';
+  document.getElementById('modalTitle').innerText = 'Thêm Dịch Vụ Mới';
   document.getElementById('assetId').value = '';
   document.getElementById('assetForm').reset();
   document.getElementById('assetModal').style.display = 'flex';
@@ -490,7 +631,7 @@ function openEditAssetModal(id) {
   const asset = allAssets.find(a => a.id === id);
   if (!asset) return;
 
-  document.getElementById('modalTitle').innerText = `Chỉnh Sửa Tài Sản #${id}`;
+  document.getElementById('modalTitle').innerText = `Chỉnh Sửa Dịch Vụ #${id}`;
   document.getElementById('assetId').value = asset.id;
   document.getElementById('assetName').value = asset.name;
   document.getElementById('assetType').value = asset.type;
@@ -539,12 +680,11 @@ async function handleSaveAsset(e) {
     loadAuditLogs();
   } catch (err) {
     console.error(err);
-    alert('Lỗi khi lưu tài sản.');
   }
 }
 
 async function deleteAsset(id) {
-  if (!confirm(`Bạn có chắc chắn muốn xóa tài sản #${id} khỏi CSDL không?`)) return;
+  if (!confirm(`Xác nhận xóa dịch vụ #${id} khỏi cơ sở dữ liệu?`)) return;
   try {
     await fetch(`/api/assets/${id}`, { method: 'DELETE' });
     loadAssets();
@@ -552,11 +692,10 @@ async function deleteAsset(id) {
     loadAuditLogs();
   } catch (err) {
     console.error(err);
-    alert('Lỗi khi xóa tài sản.');
   }
 }
 
-// 9. Audit Logs
+// 10. Nhật ký Kiểm toán
 async function loadAuditLogs() {
   const tbody = document.getElementById('auditTableBody');
   try {
@@ -565,11 +704,11 @@ async function loadAuditLogs() {
 
     tbody.innerHTML = logs.map(l => `
       <tr>
-        <td class="mono">#${l.id}</td>
-        <td class="mono" style="color:#94a3b8;">${new Date(l.created_at).toLocaleString()}</td>
-        <td><span class="badge badge-sub">${escapeHtml(l.action)}</span></td>
-        <td><strong>${escapeHtml(l.actor)}</strong></td>
-        <td>${escapeHtml(l.details)}</td>
+        <td class="code-cell" style="color:var(--text-tertiary);">#${l.id}</td>
+        <td class="code-cell" style="color:var(--text-tertiary);">${new Date(l.created_at).toLocaleString()}</td>
+        <td><span class="node-provider-tag">${escapeHtml(l.action)}</span></td>
+        <td><strong style="color:var(--text-primary);">${escapeHtml(l.actor)}</strong></td>
+        <td style="color:var(--text-secondary);">${escapeHtml(l.details)}</td>
       </tr>
     `).join('');
   } catch (err) {
