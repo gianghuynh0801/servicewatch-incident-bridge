@@ -448,7 +448,18 @@ body {
 
 .business-shield-card.critical {
   border-left: 6px solid var(--status-rose);
-  background: #fff;
+  background: var(--bg-surface);
+}
+
+[data-theme="dark"] .business-shield-card.critical {
+  background: linear-gradient(135deg, var(--bg-surface) 0%, rgba(244, 63, 94, 0.08) 100%);
+  border-color: rgba(244, 63, 94, 0.35);
+  box-shadow: 0 4px 20px rgba(244, 63, 94, 0.15);
+}
+
+[data-theme="light"] .business-shield-card.critical {
+  background: #ffffff;
+  border-color: var(--border-default);
 }
 
 .shield-left {
