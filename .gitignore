@@ -1,0 +1,5 @@
+node_modules/
+.DS_Store
+*.log
+servicewatch.db-shm
+servicewatch.db-wal

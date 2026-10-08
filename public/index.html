@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mắt Bão ServiceWatch · Incident Bridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <!-- Top Chaos Simulation Bar (Dành cho Ban giám khảo & Thí sinh test 1-click) -->
+  <header class="chaos-banner" id="chaosBanner">
+    <div class="chaos-container">
+      <div class="chaos-title">
+        <span class="pulse-indicator" id="chaosPulse"></span>
+        <span class="chaos-tag">MÔ PHỎNG SỰ CỐ (CHAOS SIMULATOR)</span>
+        <span class="chaos-desc">Công cụ kiểm chứng Workflow tự động cho Ban giám khảo</span>
+      </div>
+      <div class="chaos-controls">
+        <select id="chaosTypeSelect" class="chaos-select">
+          <option value="dns_servfail">Lỗi 1: Authoritative DNS SERVFAIL (Sập Web + Mail)</option>
+          <option value="http_503">Lỗi 2: Web Hosting HTTP 503 (Quá tải tài nguyên)</option>
+        </select>
+        <button id="toggleChaosBtn" class="btn btn-chaos">
+          <span id="chaosBtnText">⚡ Kích Hoạt Giả Lập Lỗi</span>
+        </button>
+        <button id="triggerProbeBtn" class="btn btn-secondary" title="Chạy quét ngay lập tức">
+          🔄 Quét Ngay
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Navigation Header -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>MẮT BÃO <span>SERVICEWATCH</span></h1>
+          <span class="badge badge-sub">INCIDENT BRIDGE v1.0</span>
+        </div>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-tab="tab-overview">
+          <span class="tab-icon">📊</span> Tổng quan & Bản đồ
+        </button>
+        <button class="nav-tab" data-tab="tab-incidents">
+          <span class="tab-icon">🚨</span> Sự cố & Ticket
+          <span class="badge badge-alert" id="incidentCountBadge" style="display:none;">1</span>
+        </button>
+        <button class="nav-tab" data-tab="tab-playbook">
+          <span class="tab-icon">🛡️</span> Sổ tay Ứng cứu
+        </button>
+        <button class="nav-tab" data-tab="tab-assets">
+          <span class="tab-icon">🗂️</span> Quản lý Tài sản (CRUD)
+        </button>
+        <button class="nav-tab" data-tab="tab-logs">
+          <span class="tab-icon">📜</span> Audit Log
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Body -->
+  <main class="main-content">
+    
+    <!-- TAB 1: OVERVIEW & TOPOLOGY -->
+    <section id="tab-overview" class="tab-pane active">
+      <!-- KPI Stats -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Tổng tài sản giám sát</div>
+          <div class="kpi-value" id="kpiTotalAssets">5</div>
+          <div class="kpi-sub">Domain, Hosting, VPS, Mail, SSL</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Trạng thái sức khỏe</div>
+          <div class="kpi-value text-success" id="kpiHealthStatus">100%</div>
+          <div class="kpi-sub" id="kpiHealthDetail">Tất cả dịch vụ hoạt động bình thường</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Sự cố đang xử lý</div>
+          <div class="kpi-value" id="kpiOpenIncidents">0</div>
+          <div class="kpi-sub">Chu kỳ quét: 8 giây/lần</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Kênh kết nối Provider</div>
+          <div class="kpi-value text-orange">Mắt Bão</div>
+          <div class="kpi-sub">Tự động định tuyến Ticket kỹ thuật</div>
+        </div>
+      </div>
+
+      <!-- Live Incident Alert Banner (Shows when incident is open) -->
+      <div id="activeIncidentAlert" class="incident-alert-banner" style="display: none;">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-content">
+          <h3 id="alertTitle">Sự cố hạ tầng nghiêm trọng được phát hiện!</h3>
+          <p id="alertDesc">Nhiều resolver không thể phân giải tên miền shop-demo.vn. Đang kích hoạt chu trình điều phối.</p>
+        </div>
+        <div class="alert-actions">
+          <button class="btn btn-warning" onclick="switchTab('tab-incidents')">Xem Chi Tiết & Gửi Ticket</button>
+          <button class="btn btn-outline" onclick="switchTab('tab-playbook')">Mở Sổ Tay Ứng Cứu</button>
+        </div>
+      </div>
+
+      <!-- Dependency Map Card -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>BẢN ĐỒ PHỤ THUỘC TÀI SẢN SỐ (DIGITAL ASSET DEPENDENCY MAP)</h2>
+            <p class="panel-subtitle">Hiển thị trực quan mối liên hệ giữa Tên miền, DNS Provider và các dịch vụ Hosting, Email, API</p>
+          </div>
+          <span class="status-pill status-healthy" id="mapPill">Hạ tầng Ổn định</span>
+        </div>
+        <div class="panel-body">
+          <div class="topology-tree" id="topologyTree">
+            <!-- Rendered dynamically by app.js -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Multi-Resolver Probe Stream -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>KẾT QUẢ KIỂM TRA ĐA RESOLVER THỜI GIAN THỰC (MULTI-PROBE STREAM)</h2>
+            <p class="panel-subtitle">Truy vấn đồng thời từ Google DNS, Cloudflare DNS, Quad9 và Authoritative Nameserver Mắt Bão</p>
+          </div>
+          <div class="live-tag">
+            <span class="live-dot"></span> LIVE POLLING
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Thời điểm</th>
+                  <th>Resolver / Vùng</th>
+                  <th>Mục tiêu</th>
+                  <th>Loại kiểm tra</th>
+                  <th>Mã phản hồi</th>
+                  <th>Độ trễ</th>
+                  <th>Trạng thái</th>
+                  <th>Chi tiết log thô</th>
+                </tr>
+              </thead>
+              <tbody id="probeTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: INCIDENTS & TICKET BRIDGE -->
+    <section id="tab-incidents" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>TRUNG TÂM ĐIỀU PHỐI SỰ CỐ & CẦU NỐI TICKET (INCIDENT BRIDGE)</h2>
+            <p class="panel-subtitle">Tự động gom lỗi, phân tích nguyên nhân gốc và chuẩn bị sẵn phiếu yêu cầu kỹ thuật</p>
+          </div>
+        </div>
+        <div class="panel-body" id="incidentViewContainer">
+          <!-- Loaded via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: EMERGENCY PLAYBOOK -->
+    <section id="tab-playbook" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>SỔ TAY ỨNG CỨU SỰ CỐ KHẨN CẤP (INCIDENT REMEDIATION PLAYBOOK)</h2>
+            <p class="panel-subtitle">Giải pháp giảm thiểu thiệt hại và duy trì liên lạc khi Tên miền, Website hoặc Email gặp sự cố</p>
+          </div>
+          <div id="playbookBadge" class="status-pill status-healthy">Sẵn sàng ứng phó</div>
+        </div>
+        <div class="panel-body">
+          <div class="playbook-grid" id="playbookActionList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: ASSETS MANAGEMENT (CRUD THẬT) -->
+    <section id="tab-assets" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>DANH MỤC TÀI SẢN SỐ & CƠ SỞ DỮ LIỆU (DATABASE CRUD)</h2>
+            <p class="panel-subtitle">Thao tác Thêm, Sửa, Xóa trực tiếp trên CSDL SQLite theo tiêu chí bắt buộc của cuộc thi</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddAssetModal()">
+            ➕ Thêm Tài Sản Mới
+          </button>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tên tài sản</th>
+                  <th>Phân loại</th>
+                  <th>Địa chỉ / Target</th>
+                  <th>Nhà cung cấp</th>
+                  <th>Tài sản cha</th>
+                  <th>Baseline</th>
+                  <th>Trạng thái</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="assetTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: AUDIT LOGS -->
+    <section id="tab-logs" class="tab-pane">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG (AUDIT LOGS)</h2>
+            <p class="panel-subtitle">Ghi vết toàn bộ hành vi gửi ticket, kích hoạt sự cố và thay đổi cấu hình dữ liệu</p>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Thời gian</th>
+                  <th>Hành động</th>
+                  <th>Tác nhân (Actor)</th>
+                  <th>Chi tiết sự kiện</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal Thêm / Sửa Tài Sản -->
+  <div id="assetModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalTitle">Thêm Tài Sản Mới</h3>
+        <button class="close-btn" onclick="closeAssetModal()">&times;</button>
+      </div>
+      <form id="assetForm" onsubmit="handleSaveAsset(event)">
+        <input type="hidden" id="assetId">
+        <div class="form-group">
+          <label>Tên tài sản (Asset Name):</label>
+          <input type="text" id="assetName" class="form-control" placeholder="Ví dụ: shop-demo.vn hoặc mail.shop-demo.vn" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Loại tài sản:</label>
+            <select id="assetType" class="form-control" required>
+              <option value="domain">Tên miền (Domain)</option>
+              <option value="website">Website / Subdomain</option>
+              <option value="hosting">Web Hosting / Cloud VPS</option>
+              <option value="email">Email Server (MX)</option>
+              <option value="ssl">Chứng chỉ SSL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Nhà cung cấp:</label>
+            <input type="text" id="assetProvider" class="form-control" placeholder="Ví dụ: Mắt Bão" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Địa chỉ IP / URL / Target:</label>
+          <input type="text" id="assetTarget" class="form-control" placeholder="Ví dụ: 103.1.1.20 hoặc https://www.shop-demo.vn" required>
+        </div>
+        <div class="form-group">
+          <label>Tài sản cha (Phụ thuộc vào):</label>
+          <select id="assetParentId" class="form-control">
+            <option value="">-- Không có (Tài sản gốc) --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Giá trị Baseline an toàn (để đối chiếu Drift):</label>
+          <input type="text" id="assetBaseline" class="form-control" placeholder="Ví dụ: HTTP 200, IP: 103.1.1.20">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeAssetModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary">Lưu Vào Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Xem Báo Cáo Sự Cố (Post-Incident Report) -->
+  <div id="reportModal" class="modal-overlay" style="display: none;">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <h3>Báo Cáo Sau Sự Cố (Post-Incident Report)</h3>
+        <button class="close-btn" onclick="closeReportModal()">&times;</button>
+      </div>
+      <div class="modal-body markdown-body" id="reportBody">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="closeReportModal()">Đóng Báo Cáo</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="main-footer">
+    <div class="footer-container">
+      <p>Mắt Bão ServiceWatch &copy; 2026 · Vibe Code Challenge Submission</p>
+      <p class="footer-sub">Hệ thống điều phối sự cố hạ tầng số tự động · Triển khai trên Vibe Host</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
