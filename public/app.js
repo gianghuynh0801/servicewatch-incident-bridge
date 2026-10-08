@@ -341,6 +341,29 @@ function renderBadge(status) {
   return `<span class="badge-status badge-degraded"><span class="badge-dot"></span>Chập chờn</span>`;
 }
 
+// Safe date formatter for SQLite CURRENT_TIMESTAMP
+function formatTime(str) {
+  if (!str) return 'Vừa xong';
+  try {
+    const formatted = str.includes('T') ? str : str.replace(' ', 'T') + (str.endsWith('Z') ? '' : 'Z');
+    const d = new Date(formatted);
+    return isNaN(d.getTime()) ? str : d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  } catch (e) {
+    return str;
+  }
+}
+
+function formatDateTime(str) {
+  if (!str) return 'Vừa xong';
+  try {
+    const formatted = str.includes('T') ? str : str.replace(' ', 'T') + (str.endsWith('Z') ? '' : 'Z');
+    const d = new Date(formatted);
+    return isNaN(d.getTime()) ? str : d.toLocaleString('vi-VN');
+  } catch (e) {
+    return str;
+  }
+}
+
 // 6. Render Luồng kiểm tra Live Stream
 function renderProbeTable(probes) {
   const tbody = document.getElementById('probeTableBody');
@@ -351,8 +374,7 @@ function renderProbeTable(probes) {
 
   tbody.innerHTML = probes.map(p => {
     const isOk = p.status === 'healthy';
-    const date = new Date(p.created_at);
-    const time = date.toLocaleTimeString();
+    const time = formatTime(p.created_at);
 
     return `
       <tr>
@@ -454,7 +476,7 @@ async function renderIncidentView(activeIncidents) {
       </p>
       <div style="display:flex; align-items:center; gap:20px; margin-top:10px; font-size:12px; color:var(--text-tertiary); flex-wrap:wrap;">
         <span>Đơn vị chịu trách nhiệm: <strong style="color:var(--accent-primary);">${escapeHtml(latest.responsible_provider)}</strong></span>
-        <span>Thời điểm phát hiện: <strong>${new Date(latest.first_detected_at).toLocaleString()}</strong></span>
+        <span>Thời điểm phát hiện: <strong>${formatDateTime(latest.first_detected_at)}</strong></span>
         <span>Hỗ trợ khẩn cấp: <strong>1900 1830 (Mắt Bão 24/7)</strong></span>
       </div>
     </div>
@@ -704,8 +726,8 @@ async function loadAuditLogs() {
 
     tbody.innerHTML = logs.map(l => `
       <tr>
-        <td class="code-cell" style="color:var(--text-tertiary);">#${l.id}</td>
-        <td class="code-cell" style="color:var(--text-tertiary);">${new Date(l.created_at).toLocaleString()}</td>
+        <td class="code-cell" style="color:var(--text-tertiary);">${l.id}</td>
+        <td class="code-cell" style="color:var(--text-tertiary);">${formatDateTime(l.created_at)}</td>
         <td><span class="node-provider-tag">${escapeHtml(l.action)}</span></td>
         <td><strong style="color:var(--text-primary);">${escapeHtml(l.actor)}</strong></td>
         <td style="color:var(--text-secondary);">${escapeHtml(l.details)}</td>
