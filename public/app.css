@@ -158,16 +158,24 @@ body {
   gap: 12px;
 }
 
-.brand-mark {
-  width: 38px;
-  height: 38px;
-  background: linear-gradient(135deg, var(--accent-primary) 0%, #c2410c 100%);
-  border-radius: var(--radius-sm);
+.brand-mark-wrapper {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.3);
+  filter: drop-shadow(0 2px 8px rgba(234, 88, 12, 0.28));
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: pointer;
+}
+
+.brand-mark-wrapper:hover {
+  transform: scale(1.05);
+}
+
+.brand-logo-img {
+  width: 40px;
+  height: 40px;
+  display: block;
+  border-radius: 11px;
 }
 
 .brand-meta {
@@ -182,10 +190,18 @@ body {
 }
 
 .brand-name {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.brand-name-accent {
+  background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
 }
 
 .brand-env {
@@ -195,14 +211,16 @@ body {
   color: var(--accent-primary);
   background: var(--accent-primary-subtle);
   border: 1px solid var(--accent-primary-border);
-  padding: 1px 6px;
+  padding: 1px 7px;
   border-radius: var(--radius-xs);
+  letter-spacing: 0.02em;
 }
 
 .brand-sub {
   font-size: 11.5px;
   color: var(--text-tertiary);
   font-weight: 500;
+  margin-top: 2px;
 }
 
 /* Segmented Navigation */

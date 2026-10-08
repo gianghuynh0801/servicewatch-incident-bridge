@@ -7,6 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="logo.svg">
   <link rel="stylesheet" href="app.css">
 </head>
 <body>
@@ -16,15 +17,12 @@
     <div class="header-inner">
       <!-- Brand & Product Identity -->
       <div class="brand-group">
-        <div class="brand-mark" title="ServiceWatch Incident Bridge">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <polyline points="9 12 11 14 15 10"/>
-          </svg>
+        <div class="brand-mark-wrapper" title="ServiceWatch · Digital Infrastructure Incident Bridge">
+          <img src="logo.svg" alt="ServiceWatch Logo" width="40" height="40" class="brand-logo-img">
         </div>
         <div class="brand-meta">
           <div class="brand-title">
-            <span class="brand-name">ServiceWatch</span>
+            <span class="brand-name">Service<span class="brand-name-accent">Watch</span></span>
             <span class="brand-env">v1.2 Pro</span>
           </div>
           <span class="brand-sub">Cầu Nối Điều Phối Sự Cố · Tối Ưu Cho Mắt Bão Cloud</span>
@@ -494,9 +492,10 @@
   <!-- App Footer -->
   <footer class="app-footer">
     <div class="footer-inner">
-      <div>
-        <strong>ServiceWatch</strong> · Cầu Nối Xử Lý Sự Cố Hạ Tầng Số &copy; 2026
-        <span style="margin: 0 8px; opacity:0.3;">|</span>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <img src="logo.svg" alt="ServiceWatch" width="20" height="20" style="border-radius:5px;">
+        <span><strong>Service<span style="color:var(--accent-primary);">Watch</span></strong> · Cầu Nối Xử Lý Sự Cố Hạ Tầng Số &copy; 2026</span>
+        <span style="margin: 0 4px; opacity:0.3;">|</span>
         <span>Đồ án tham dự cuộc thi Vibe Code Challenge</span>
       </div>
       <div class="hotline-badge">
