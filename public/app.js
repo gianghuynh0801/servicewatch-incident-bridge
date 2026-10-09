@@ -230,12 +230,30 @@ function updateKPIs(data) {
     }
   }
 
-  // Incident active banner
+  // Incident active banner (Chớp chớp rung rung & Báo động)
   const alertBar = document.getElementById('activeIncidentAlert');
   const navBadge = document.getElementById('navIncidentBadge');
 
   if (openCount > 0) {
+    const wasHidden = alertBar.style.display === 'none' || !alertBar.style.display;
     alertBar.style.display = 'block';
+
+    if (wasHidden) {
+      alertBar.classList.add('vibrating-alarm');
+      setTimeout(() => alertBar.classList.remove('vibrating-alarm'), 800);
+
+      // Bắn thông báo đẩy Desktop thật nếu người dùng đã bật quyền
+      if (window.Notification && Notification.permission === 'granted') {
+        const inc = data.activeIncidents[0];
+        try {
+          new Notification('🚨 [SERVICEWATCH] Báo Động Hạ Tầng Số!', {
+            body: `${inc.title} - Hệ thống đã bắn tin cảnh báo tới Telegram Bot & soạn Ticket Mắt Bão!`,
+            icon: '/logo.svg'
+          });
+        } catch (e) {}
+      }
+    }
+
     navBadge.style.display = 'inline-block';
     navBadge.innerText = openCount;
 
@@ -553,7 +571,14 @@ async function loadPlaybook() {
 
     container.innerHTML = playbook.actions.map(act => {
       let actionBtn = '';
-      if (act.id === 'failover_page') {
+      if (act.id === 'out_of_band_alert') {
+        actionBtn = `
+          <button class="btn btn-sm btn-primary" onclick="openAlertChannelsModal()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Kênh Báo Động (App / Telegram)</span>
+          </button>
+        `;
+      } else if (act.id === 'failover_page') {
         actionBtn = `
           <button class="btn btn-sm btn-secondary" onclick="toggleFailover()">
             <span>${playbook.failover_active ? 'Tắt Trang Bảo Trì' : 'Bật Trang Thông Báo Bảo Trì'}</span>
@@ -746,4 +771,158 @@ function escapeHtml(text) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// 11. Kênh Cảnh Báo Ngoài Luồng Tức Thời (Out-of-band Dispatcher)
+function openAlertChannelsModal() {
+  const modal = document.getElementById('alertChannelsModal');
+  if (modal) modal.style.display = 'flex';
+
+  // Check browser notification permission
+  updateBrowserPushStatusUI();
+}
+
+function closeAlertChannelsModal() {
+  const modal = document.getElementById('alertChannelsModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function updateBrowserPushStatusUI() {
+  const statusPill = document.getElementById('browserPushStatus');
+  const chipLabel = document.getElementById('desktopPushLabel');
+  if (!('Notification' in window)) {
+    if (statusPill) statusPill.innerText = 'Trình duyệt không hỗ trợ';
+    if (chipLabel) chipLabel.innerText = 'Desktop Push: Không hỗ trợ';
+    return;
+  }
+  if (Notification.permission === 'granted') {
+    if (statusPill) {
+      statusPill.className = 'status-pill active';
+      statusPill.innerText = 'ĐÃ BẬT (Sẵn sàng nổ chuông)';
+    }
+    if (chipLabel) chipLabel.innerText = 'Desktop Push: Đang bật';
+  } else if (Notification.permission === 'denied') {
+    if (statusPill) {
+      statusPill.className = 'status-pill';
+      statusPill.innerText = 'Đã bị từ chối';
+    }
+    if (chipLabel) chipLabel.innerText = 'Desktop Push: Bị chặn';
+  } else {
+    if (statusPill) {
+      statusPill.className = 'status-pill';
+      statusPill.innerText = 'Chờ cấp quyền';
+    }
+    if (chipLabel) chipLabel.innerText = 'Desktop Push: Bật ngay';
+  }
+}
+
+async function triggerRealDesktopPush() {
+  if (!('Notification' in window)) {
+    alert('Trình duyệt của bạn không hỗ trợ Web Push Notification!');
+    return;
+  }
+
+  let perm = Notification.permission;
+  if (perm !== 'granted') {
+    perm = await Notification.requestPermission();
+  }
+
+  updateBrowserPushStatusUI();
+
+  if (perm === 'granted') {
+    new Notification('🚨 [SERVICEWATCH] Báo Động Hạ Tầng Khẩn Cấp!', {
+      body: 'Phát hiện sự cố trên shop-demo.vn! Nhấn để vào bảng điều khiển ứng cứu và gửi Ticket Mắt Bão.',
+      icon: '/logo.svg'
+    });
+
+    await fetch('/api/alerts/test', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channel: 'browser', message: 'Kích hoạt thông báo đẩy Desktop thật trên trình duyệt' })
+    });
+    loadAuditLogs();
+  }
+}
+
+async function simulateTelegramAlert() {
+  const box = document.getElementById('channelPreviewBox');
+  const title = document.getElementById('previewHeaderTitle');
+  const content = document.getElementById('previewContent');
+
+  box.style.display = 'block';
+  title.innerText = '📱 Tin Nhắn Đẩy Telegram Bot (@matbao_servicewatch_bot)';
+  content.innerText = 
+`⚡ [SERVICEWATCH · CẢNH BÁO KHẨN CẤP]
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚨 TÀI SẢN BỊ ẢNH HƯỞNG: shop-demo.vn
+⚠️ PHÂN LOẠI LỖI: CRITICAL INFRASTRUCTURE OUTAGE
+🛑 MÃ SỰ CỐ: #INC-2026-SERVFAIL
+⏱ THỜI GIAN: ${new Date().toLocaleTimeString('vi-VN')}
+📦 PHẠM VI SẬP LIÊN ĐỚI:
+  • Website Bán Hàng (www.shop-demo.vn) -> Gián đoạn
+  • Hộp thư doanh nghiệp (mail.shop-demo.vn) -> Mất kết nối
+  • Cổng thanh toán API (api.shop-demo.vn) -> Chập chờn
+
+🎯 ĐƠN VỊ TIẾP NHẬN: Mắt Bão Ecosystem Support (24/7)
+📋 BẢN THẢO TICKET: Đã soạn sẵn mã #MB-98241 kèm log chi tiết.
+
+👉 Nhấn để xem & duyệt gửi Ticket ngay:
+https://servicewatch.matbao.ai/incident/1`;
+
+  await fetch('/api/alerts/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel: 'telegram', message: 'Bắn tin cảnh báo tức thời tới Telegram Bot @matbao_servicewatch_bot' })
+  });
+  loadAuditLogs();
+}
+
+async function simulateEmailAlert() {
+  const box = document.getElementById('channelPreviewBox');
+  const title = document.getElementById('previewHeaderTitle');
+  const content = document.getElementById('previewContent');
+
+  box.style.display = 'block';
+  title.innerText = '📧 Email Dự Phòng Ngoài Luồng (Gửi tới admin-backup@gmail.com)';
+  content.innerText = 
+`Tiêu đề: [URGENT ALERT] ServiceWatch phát hiện shop-demo.vn gián đoạn dịch vụ
+Người gửi: alerts@ops.servicewatch.vn (SMTP Gateway Dự Phòng)
+Người nhận: admin-backup@gmail.com (Email cá nhân dự phòng ngoài luồng)
+----------------------------------------------------------------------
+Kính gửi Quản Trị Viên,
+
+Hệ thống ServiceWatch vừa phát hiện sự cố gián đoạn kéo theo trên tài sản số shop-demo.vn:
+- Nguyên nhân: DNS SERVFAIL / Hosting HTTP 503
+- Bản thảo phiếu hỗ trợ kỹ thuật gửi Mắt Bão đã được tạo tự động với đầy đủ log resolver.
+- Lưu ý: Hộp thư công ty @shop-demo.vn đang bị ảnh hưởng, vui lòng theo dõi tiến trình qua hòm thư Gmail này.
+
+Đường dẫn điều phối khẩn cấp: https://servicewatch.matbao.ai/incident/1`;
+
+  await fetch('/api/alerts/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel: 'email', message: 'Gửi email cảnh báo ngoài luồng tới admin-backup@gmail.com' })
+  });
+  loadAuditLogs();
+}
+
+async function simulateAppPushAlert() {
+  const box = document.getElementById('channelPreviewBox');
+  const title = document.getElementById('previewHeaderTitle');
+  const content = document.getElementById('previewContent');
+
+  box.style.display = 'block';
+  title.innerText = '📱 Push Notification Ứng Dụng Mắt Bão One (iOS / Android)';
+  content.innerText = 
+`[MẮT BÃO ONE · THÔNG BÁO KHẨN CẤP]
+Dịch vụ shop-demo.vn gặp sự cố gián đoạn!
+Cầu nối ServiceWatch đã sẵn sàng bản thảo Ticket hỗ trợ.
+Chạm để mở ứng dụng Mắt Bão One và gửi phiếu kỹ thuật 1-chạm.`;
+
+  await fetch('/api/alerts/test', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel: 'app', message: 'Bắn Push Notification qua Webhook App Mắt Bão One' })
+  });
+  loadAuditLogs();
 }

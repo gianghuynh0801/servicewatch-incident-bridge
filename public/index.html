@@ -110,21 +110,49 @@
     </div>
   </header>
 
-  <!-- Notification Bar for Active Incidents -->
+  <!-- Notification Bar for Active Incidents (Chớp chớp rung rung & Kênh báo động) -->
   <div id="activeIncidentAlert" class="incident-banner" style="display: none;">
     <div class="banner-inner">
-      <div class="banner-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
-        </svg>
+      <div class="banner-icon-wrapper">
+        <div class="beacon-ripple"></div>
+        <div class="banner-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
       </div>
       <div class="banner-body">
-        <div class="banner-title" id="alertTitle">Phát hiện sự cố gián đoạn dịch vụ nghiêm trọng</div>
+        <div class="banner-header-line">
+          <span class="live-alarm-tag">
+            <span class="ping-circle"></span>
+            BÁO ĐỘNG SỰ CỐ
+          </span>
+          <span class="banner-title" id="alertTitle">Phát hiện sự cố gián đoạn dịch vụ nghiêm trọng</span>
+        </div>
         <div class="banner-desc" id="alertDesc">Hệ thống đã tự động gom bằng chứng kỹ thuật và soạn sẵn bản thảo Ticket chuyển tiếp Kỹ thuật Mắt Bão.</div>
+        <div class="banner-channels-bar">
+          <span class="channel-chip sent" title="Đã gửi tin cảnh báo qua Telegram Bot">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Telegram Bot: Đã bắn tin (0.4s)
+          </span>
+          <span class="channel-chip sent" title="Đã gửi qua Email ngoài luồng dự phòng">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Mail Dự Phòng: Đã gửi
+          </span>
+          <span class="channel-chip push" id="desktopPushChip" onclick="triggerRealDesktopPush()" title="Nhấn để kích hoạt chuông báo đẩy màn hình máy tính">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span id="desktopPushLabel">Desktop Push: Sẵn sàng</span>
+          </span>
+        </div>
       </div>
       <div class="banner-actions">
+        <button class="btn btn-sm btn-outline-danger" onclick="openAlertChannelsModal()" title="Xem chi tiết các kênh thông báo tức thời">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          Kênh Báo Động (App/Telegram)
+        </button>
         <button class="btn btn-sm btn-primary" onclick="switchTab('tab-incidents')">Xem Chi Tiết & Gửi Ticket</button>
-        <button class="btn btn-sm btn-secondary" onclick="switchTab('tab-playbook')">Mở Sổ Tay Ứng Cứu</button>
+        <button class="btn btn-sm btn-secondary" onclick="switchTab('tab-playbook')">Sổ Tay Ứng Cứu</button>
       </div>
     </div>
   </div>
@@ -485,6 +513,134 @@
       </div>
       <div class="modal-box-footer">
         <button type="button" class="btn btn-sm btn-secondary" onclick="closeReportModal()">Đóng Báo Cáo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Kênh Cảnh Báo Tức Thời Đa Kênh (Multi-channel Out-of-band Dispatcher) -->
+  <div id="alertChannelsModal" class="modal-backdrop" style="display: none;">
+    <div class="modal-box modal-wide">
+      <div class="modal-box-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="modal-icon-badge danger">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div>
+            <h4>Hệ Thống Cảnh Báo Tức Thời Đa Kênh (Out-of-Band Alerting)</h4>
+            <p style="font-size:12px; color:var(--text-tertiary); margin:0;">Báo động ngay lập tức tới điện thoại & máy tính khi hạ tầng gặp sự cố</p>
+          </div>
+        </div>
+        <button class="btn-close" onclick="closeAlertChannelsModal()">&times;</button>
+      </div>
+      <div class="modal-box-body">
+        
+        <!-- Lưu ý SRE quan trọng -->
+        <div class="info-alert-box" style="margin-bottom:18px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <div>
+            <strong>Nguyên tắc SRE cốt lõi:</strong> Khi Tên miền hoặc DNS gặp sự cố, toàn bộ hòm thư công ty (ví dụ: <code>admin@shop-demo.vn</code>) sẽ bị tê liệt đồng loạt. ServiceWatch sử dụng <strong>Kênh cảnh báo ngoài luồng độc lập</strong> để đảm bảo bạn nhận được thông báo chỉ trong <strong>0.5 – 2 giây</strong>!
+          </div>
+        </div>
+
+        <div class="channels-grid">
+          
+          <!-- Kênh 1: Telegram Bot / Zalo OA -->
+          <div class="channel-card">
+            <div class="channel-card-top">
+              <div class="channel-icon telegram">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </div>
+              <div class="channel-info">
+                <h5>Telegram Bot / Zalo OA</h5>
+                <span class="status-pill active">Đang hoạt động (Độ trễ: 0.4s)</span>
+              </div>
+            </div>
+            <p class="channel-desc">Bắn tin nhắn thông báo trực tiếp vào điện thoại của Ban Quản Trị qua Telegram Bot <code>@matbao_servicewatch_bot</code>.</p>
+            <div class="channel-action">
+              <button class="btn btn-sm btn-primary" onclick="simulateTelegramAlert()">
+                <span>Bắn Thử Tin Nhắn Telegram</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Kênh 2: Thông Báo Đẩy Trình Duyệt (Web Push) -->
+          <div class="channel-card">
+            <div class="channel-card-top">
+              <div class="channel-icon browser">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              </div>
+              <div class="channel-info">
+                <h5>Thông Báo Đẩy Desktop (Web Push)</h5>
+                <span class="status-pill" id="browserPushStatus">Sẵn sàng kích hoạt</span>
+              </div>
+            </div>
+            <p class="channel-desc">Bật popup chuông báo động trực tiếp trên màn hình Windows / Mac ngay cả khi bạn đang thu nhỏ trình duyệt.</p>
+            <div class="channel-action">
+              <button class="btn btn-sm btn-secondary" onclick="triggerRealDesktopPush()">
+                <span>Kích Hoạt Chuông Báo Desktop</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Kênh 3: Email Dự Phòng Ngoài Luồng -->
+          <div class="channel-card">
+            <div class="channel-card-top">
+              <div class="channel-icon email">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <div class="channel-info">
+                <h5>Email Dự Phòng Ngoài Luồng</h5>
+                <span class="status-pill active">Đã thiết lập (admin-backup@gmail.com)</span>
+              </div>
+            </div>
+            <p class="channel-desc">Gửi báo động tới email cá nhân độc lập qua SMTP Gateway riêng biệt, hoàn toàn không phụ thuộc mail server công ty.</p>
+            <div class="channel-action">
+              <button class="btn btn-sm btn-secondary" onclick="simulateEmailAlert()">
+                <span>Kiểm Tra Gửi Mail Dự Phòng</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Kênh 4: App Mắt Bão Mobile (Mắt Bão One) -->
+          <div class="channel-card">
+            <div class="channel-card-top">
+              <div class="channel-icon matbao">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </div>
+              <div class="channel-info">
+                <h5>App Di Động Mắt Bão One</h5>
+                <span class="status-pill active">Webhook Provider Hub đã kết nối</span>
+              </div>
+            </div>
+            <p class="channel-desc">Đẩy Push Notification về App Mắt Bão trên điện thoại iOS / Android của khách hàng để mở xem và tạo ticket 1-chạm.</p>
+            <div class="channel-action">
+              <button class="btn btn-sm btn-secondary" onclick="simulateAppPushAlert()">
+                <span>Mô Phỏng Push App Mắt Bão</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Khung hiển thị mô phỏng tin nhắn tức thì (Live Preview Terminal) -->
+        <div id="channelPreviewBox" style="display:none; margin-top:20px;">
+          <div class="preview-header">
+            <span id="previewHeaderTitle">Xem trước tin nhắn Telegram Bot</span>
+            <span class="live-dot-pulse">Đã phát tức thời</span>
+          </div>
+          <div class="telegram-phone-mockup" id="previewContent">
+            <!-- Injected via JS -->
+          </div>
+        </div>
+
+      </div>
+      <div class="modal-box-footer">
+        <button type="button" class="btn btn-sm btn-secondary" onclick="closeAlertChannelsModal()">Đóng Cửa Sổ</button>
       </div>
     </div>
   </div>

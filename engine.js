@@ -104,50 +104,58 @@ function handleIncidentDetected(chaosType, isFailover) {
     'SSL Certificate'
   ];
 
-  if (!existing || existing.status === 'Resolved' || existing.status === 'Closed') {
-    // Tạo mới incident ở mức Suspected/Confirmed
-    const ticketSubject = `[Critical][DNS] Nhiều resolver không phân giải được shop-demo.vn (SERVFAIL/Timeout)`;
-    const ticketBody = generateDraftTicketContent(chaosType);
+  const title = chaosType === 'dns_servfail'
+    ? 'Authoritative DNS và nhiều Public Resolver không thể phân giải shop-demo.vn'
+    : 'Web Hosting trả về HTTP 503 Service Unavailable';
+  const rootCause = chaosType === 'dns_servfail' ? 'DNS_AUTHORITATIVE_FAILURE' : 'HOSTING_CAPACITY_EXHAUSTED';
+  const provider = chaosType === 'dns_servfail' ? 'Mắt Bão DNS Team' : 'Mắt Bão Hosting Support';
+  const ticketSubject = `[Critical][DNS] Nhiều resolver không phân giải được shop-demo.vn (SERVFAIL/Timeout)`;
+  const ticketBody = generateDraftTicketContent(chaosType);
 
+  if (!existing) {
     db.prepare(`
       INSERT INTO incidents (
         fingerprint, title, severity, status, root_cause_type, responsible_provider,
         affected_services, consecutive_failures, ticket_subject, ticket_body, ticket_status
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
-      fingerprint,
-      chaosType === 'dns_servfail'
-        ? 'Authoritative DNS và nhiều Public Resolver không thể phân giải shop-demo.vn'
-        : 'Web Hosting trả về HTTP 503 Service Unavailable',
-      'Critical',
-      'Confirmed',
-      chaosType === 'dns_servfail' ? 'DNS_AUTHORITATIVE_FAILURE' : 'HOSTING_CAPACITY_EXHAUSTED',
-      chaosType === 'dns_servfail' ? 'Mắt Bão DNS Team' : 'Mắt Bão Hosting Support',
-      JSON.stringify(affectedServices),
-      1,
-      ticketSubject,
-      ticketBody,
-      'draft'
+      fingerprint, title, 'Critical', 'Confirmed', rootCause, provider,
+      JSON.stringify(affectedServices), 1, ticketSubject, ticketBody, 'draft'
     );
+  } else if (existing.status === 'Resolved' || existing.status === 'Closed') {
+    db.prepare(`
+      UPDATE incidents SET
+        title = ?, severity = 'Critical', status = 'Confirmed', root_cause_type = ?,
+        responsible_provider = ?, affected_services = ?, consecutive_failures = 1,
+        ticket_subject = ?, ticket_body = ?, ticket_status = 'draft', recovery_passes = 0,
+        first_detected_at = CURRENT_TIMESTAMP, last_seen_at = CURRENT_TIMESTAMP,
+        resolved_at = NULL, post_incident_report = NULL
+      WHERE id = ?
+    `).run(
+      title, rootCause, provider, JSON.stringify(affectedServices),
+      ticketSubject, ticketBody, existing.id
+    );
+  } else {
+    // Đang active, cập nhật counter
+    db.prepare(`
+      UPDATE incidents SET
+        consecutive_failures = consecutive_failures + 1,
+        last_seen_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `).run(existing.id);
+  }
 
-    // Cập nhật trạng thái các assets
-    db.prepare("UPDATE assets SET status = 'down' WHERE name = 'shop-demo.vn'").run();
-    db.prepare("UPDATE assets SET status = 'degraded' WHERE parent_asset_id = 1").run();
+  // Cập nhật trạng thái các assets
+  db.prepare("UPDATE assets SET status = 'down' WHERE name = 'shop-demo.vn'").run();
+  db.prepare("UPDATE assets SET status = 'degraded' WHERE parent_asset_id = 1").run();
 
-    // Ghi audit log
+  // Ghi audit log nếu mới confirm
+  if (!existing || existing.status === 'Resolved' || existing.status === 'Closed') {
     db.prepare('INSERT INTO audit_logs (action, actor, details) VALUES (?, ?, ?)').run(
       'INCIDENT_CONFIRMED',
       'Incident Engine',
-      `Phát hiện và xác nhận sự cố ${chaosType} trên shop-demo.vn. Đã tự động lập bản thảo ticket gửi Mắt Bão.`
+      `Xác thực sự cố nghiêm trọng trên shop-demo.vn (Nguyên nhân: ${rootCause}). Đã soạn sẵn Ticket.`
     );
-  } else {
-    // Tăng số lần fail liên tiếp
-    db.prepare(`
-      UPDATE incidents
-      SET consecutive_failures = consecutive_failures + 1,
-          last_seen_at = CURRENT_TIMESTAMP
-      WHERE id = ?
-    `).run(existing.id);
   }
 }
 

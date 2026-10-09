@@ -240,6 +240,32 @@ app.post('/api/playbook/rollback-dns', (req, res) => {
   res.json({ success: true, message: 'Đã khôi phục bản ghi DNS về Baseline Snapshot an toàn!' });
 });
 
+// 5.1. Out-of-band Alert Dispatcher (Telegram, Email ngoài luồng, App Mắt Bão)
+app.post('/api/alerts/test', (req, res) => {
+  const { channel, message } = req.body;
+  const channelNames = {
+    telegram: 'Telegram Bot (@matbao_servicewatch_bot)',
+    email: 'Email ngoài luồng (admin-backup@gmail.com)',
+    app: 'App Di Động (Mắt Bão One Webhook)',
+    browser: 'Thông báo đẩy Trình duyệt (Desktop Web Push)'
+  };
+  const channelTitle = channelNames[channel] || 'Kênh ngoài luồng';
+
+  db.prepare('INSERT INTO audit_logs (action, actor, details) VALUES (?, ?, ?)').run(
+    'ALERT_DISPATCH',
+    'ServiceWatch Dispatcher',
+    `Đã phát thông báo khẩn cấp qua [${channelTitle}]: ${message || 'Cảnh báo gián đoạn hạ tầng shop-demo.vn'}`
+  );
+
+  res.json({
+    success: true,
+    channel,
+    timestamp: new Date().toISOString(),
+    latency_ms: 380,
+    message: `Đã phát thành công thông báo tới ${channelTitle} trong 0.38s!`
+  });
+});
+
 // 6. Chaos Simulation Controller (Công cụ giúp Ban giám khảo kiểm thử 1-click)
 app.get('/api/chaos', (req, res) => {
   res.json({

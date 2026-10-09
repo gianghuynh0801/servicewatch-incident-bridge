@@ -538,17 +538,58 @@ body {
   font-weight: 700;
 }
 
-/* Incident active top banner */
+/* Incident active top banner - Chớp chớp rung rung & Cảnh báo tức thời */
 .incident-banner {
   background: var(--status-rose-bg);
-  border-bottom: 2px solid var(--status-rose-border);
+  border-bottom: 2px solid var(--status-rose);
   padding: 12px 24px;
-  animation: slideDown 0.25s ease-out;
+  animation: slideDown 0.3s ease-out, crimsonBeaconPulse 2s infinite ease-in-out;
+  position: relative;
+  z-index: 50;
+  transition: all 0.25s ease;
 }
 
-@keyframes slideDown {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+/* Hiệu ứng rung báo động (Tactile Vibration Alarm) */
+.incident-banner.vibrating-alarm {
+  animation: alertEntranceVibrate 0.65s cubic-bezier(0.36, 0.07, 0.19, 0.97) both, crimsonBeaconPulse 2s infinite ease-in-out;
+}
+
+@keyframes alertEntranceVibrate {
+  0% { transform: translateY(-100%); opacity: 0; }
+  25% { transform: translateY(0); opacity: 1; }
+  35% { transform: translateX(-6px) rotate(-0.5deg); }
+  45% { transform: translateX(6px) rotate(0.5deg); }
+  55% { transform: translateX(-4px) rotate(-0.3deg); }
+  65% { transform: translateX(4px) rotate(0.3deg); }
+  75% { transform: translateX(-2px); }
+  85% { transform: translateX(2px); }
+  100% { transform: translateX(0); }
+}
+
+/* Hiệu ứng chớp hào quang đỏ chu kỳ (Pulsing Crimson Beacon) */
+@keyframes crimsonBeaconPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.5);
+    border-bottom-color: rgba(244, 63, 94, 0.6);
+  }
+  50% {
+    box-shadow: 0 4px 20px 4px rgba(244, 63, 94, 0.35);
+    border-bottom-color: #ff2d55;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(244, 63, 94, 0);
+    border-bottom-color: rgba(244, 63, 94, 0.6);
+  }
+}
+
+[data-theme="dark"] .incident-banner {
+  background: linear-gradient(90deg, rgba(244, 63, 94, 0.18) 0%, rgba(15, 20, 34, 0.98) 50%, rgba(244, 63, 94, 0.18) 100%);
+  border-bottom: 2px solid rgba(244, 63, 94, 0.65);
+}
+
+[data-theme="light"] .incident-banner {
+  background: linear-gradient(90deg, #fff1f2 0%, #ffffff 50%, #fff1f2 100%);
+  border-bottom: 2px solid var(--status-rose);
 }
 
 .banner-inner {
@@ -561,20 +602,99 @@ body {
   flex-wrap: wrap;
 }
 
+.banner-icon-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.beacon-ripple {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.3);
+  animation: beaconPingWave 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes beaconPingWave {
+  0% { transform: scale(0.85); opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
 .banner-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(244, 63, 94, 0.18);
+  border: 1px solid var(--status-rose);
   color: var(--status-rose);
   display: flex;
   align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  animation: sirenAlarmWobble 1.6s infinite ease-in-out;
+}
+
+@keyframes sirenAlarmWobble {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  12% { transform: rotate(-14deg) scale(1.15); }
+  24% { transform: rotate(14deg) scale(1.15); }
+  36% { transform: rotate(-8deg) scale(1.08); }
+  48% { transform: rotate(8deg) scale(1.08); }
+  60% { transform: rotate(0deg) scale(1); }
 }
 
 .banner-body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 3px;
+  min-width: 280px;
+}
+
+.banner-header-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.live-alarm-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--status-rose);
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 999px;
+  box-shadow: 0 0 10px rgba(244, 63, 94, 0.6);
+  animation: badgeBlink 1.2s infinite alternate;
+}
+
+@keyframes badgeBlink {
+  0% { opacity: 0.85; transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1.03); box-shadow: 0 0 14px rgba(244, 63, 94, 0.85); }
+}
+
+.ping-circle {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
 }
 
 .banner-title {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 700;
   color: var(--status-rose-text);
 }
@@ -582,6 +702,46 @@ body {
 .banner-desc {
   font-size: 12.5px;
   color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.banner-channels-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.channel-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  color: var(--text-secondary);
+}
+
+.channel-chip.sent {
+  color: var(--status-emerald-text);
+  background: var(--status-emerald-bg);
+  border-color: var(--status-emerald-border);
+}
+
+.channel-chip.push {
+  cursor: pointer;
+  color: var(--accent-primary);
+  background: var(--accent-primary-subtle);
+  border-color: var(--accent-primary-border);
+  transition: var(--transition);
+}
+
+.channel-chip.push:hover {
+  transform: translateY(-1px);
 }
 
 .banner-actions {
@@ -1246,4 +1406,126 @@ body {
   .form-grid-2 {
     grid-template-columns: 1fr;
   }
+}
+
+/* 14. OUT-OF-BAND CHANNELS DISPATCHER MODAL & PREVIEW */
+.modal-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-icon-badge.danger {
+  background: var(--status-rose-bg);
+  color: var(--status-rose);
+  border: 1px solid var(--status-rose-border);
+}
+
+.channels-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.channel-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  transition: var(--transition);
+}
+
+.channel-card:hover {
+  border-color: var(--border-active);
+  box-shadow: var(--shadow-card);
+}
+
+.channel-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.channel-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.channel-icon.telegram { background: rgba(36, 161, 222, 0.12); color: #24a1de; border: 1px solid rgba(36, 161, 222, 0.3); }
+.channel-icon.browser { background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.channel-icon.email { background: rgba(16, 185, 129, 0.12); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+.channel-icon.matbao { background: rgba(234, 88, 12, 0.12); color: var(--accent-primary); border: 1px solid var(--accent-primary-border); }
+
+.channel-info h5 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.channel-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.status-pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+}
+
+.status-pill.active {
+  background: var(--status-emerald-bg);
+  color: var(--status-emerald-text);
+  border: 1px solid var(--status-emerald-border);
+}
+
+.telegram-phone-mockup {
+  background: #0d141e;
+  border: 1px solid #1e293b;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: #e2e8f0;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  border-left: 4px solid #24a1de;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.live-dot-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--status-emerald);
+  font-weight: 600;
 }
