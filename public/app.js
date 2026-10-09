@@ -258,8 +258,24 @@ function updateKPIs(data) {
     navBadge.innerText = openCount;
 
     const inc = data.activeIncidents[0];
-    document.getElementById('alertTitle').innerText = inc.title;
-    document.getElementById('alertDesc').innerText = `Nguyên nhân: ${inc.root_cause_type} · Đơn vị tiếp nhận hỗ trợ: ${inc.responsible_provider} · Đã soạn xong Ticket`;
+    const isDNS = (inc.root_cause_type || '').includes('DNS') || (inc.title || '').includes('DNS');
+
+    // Tiêu đề ngắn gọn, dễ hiểu cho non-tech
+    const shortTitle = isDNS 
+      ? 'Tên Miền Mất Kết Nối (DNS SERVFAIL)' 
+      : 'Máy Chủ Web Hosting Quá Tải (HTTP 503)';
+
+    // Diễn giải súc tích: tác động + kênh báo
+    const shortDesc = isDNS
+      ? 'Website & Hòm thư bị gián đoạn kéo theo · Đã báo qua Telegram (0.4s) & Mail'
+      : 'Website bán hàng đang bị gián đoạn · Đã báo qua Telegram (0.4s) & Mail';
+
+    const titleEl = document.getElementById('alertTitle');
+    const descEl = document.getElementById('alertDesc');
+    const statusTagEl = document.getElementById('alertStatusTag');
+    if (titleEl) titleEl.innerText = shortTitle;
+    if (descEl) descEl.innerText = shortDesc;
+    if (statusTagEl) statusTagEl.innerText = 'Đã Soạn Xong Ticket';
   } else {
     alertBar.style.display = 'none';
     navBadge.style.display = 'none';
