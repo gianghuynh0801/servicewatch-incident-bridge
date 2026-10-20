@@ -1023,7 +1023,7 @@ DNS monitoring và alert qua email/webhook đã tồn tại. Vì vậy, phần �
 
 ---
 
-## 26. Các giới hạn cần nói rõ
+## 26. Các giới hạn cần nói rõ và Lộ trình giải quyết
 
 MVP không nên hứa phát hiện 100% dependency.
 
@@ -1042,6 +1042,37 @@ Các điểm mù gồm:
 Thông điệp nên dùng:
 
 > Hệ thống lập bản đồ dựa trên nhiều nguồn, hiển thị bằng chứng và mức độ tin cậy; khi dữ liệu chưa đủ, hệ thống đánh dấu unknown thay vì kết luận chắc chắn.
+
+### 26.1. Xóa bỏ điểm mù bằng Bộ API Chuyên Biệt (Specialized Probing APIs)
+
+Để khắc phục các điểm mù trên mà không bắt người dùng can thiệp thủ công:
+
+1. **Heartbeat API (Dead Man's Snitch cho Cron & Worker ngầm):**
+   - Hệ thống cấp webhook ping duy nhất cho từng tác vụ: `POST /api/heartbeat/:token`.
+   - Cron job / Worker chỉ cần thêm `curl -fsS -m 10 https://servicewatch.vn/api/heartbeat/cron_backup_db`.
+   - Nếu quá chu kỳ (ví dụ 24h + 15p ân hạn) không nhận được tín hiệu -> Tự động mở Incident `CRON_BACKUP_MISSED`.
+2. **Synthetic Payment Gateway & Webhook Probe:**
+   - Định kỳ gửi request kiểm tra giả lập (sandbox handshake) tới các cổng thanh toán phổ biến (VNPay IPN, MoMo, ZaloPay, PayOS).
+   - Đo lường độ trễ và phát hiện sớm khi callback webhook bị firewall/WAF chặn IP.
+3. **Backup Freshness Check API:**
+   - Kiểm tra ngày giờ và dung lượng của bản sao lưu gần nhất trên Cloud/S3/FTP.
+   - Báo động khi "Đã quá 48h không có bản sao lưu mới" hoặc "File backup dung lượng 0KB bất thường".
+4. **Provider Status Ingest API:**
+   - Tự động đồng bộ trạng thái từ Statuspage của Mắt Bão, Cloudflare, AWS, Google Cloud.
+   - Nhận diện sự cố diện rộng nhà cung cấp để tránh báo oan cho máy chủ nội bộ.
+5. **Renewal & Expiry Radar (RDAP / Expiry API):**
+   - Tự động truy vấn ngày hết hạn tên miền qua giao thức RDAP/WHOIS VNNIC và hạn SSL qua TLS Handshake.
+   - Đếm ngược số ngày còn lại (Days Left) và cảnh báo gia hạn trước 30/15/7 ngày; điều hướng 1-click gia hạn tại `id.matbao.net`.
+
+### 26.2. Đơn giản hóa Onboarding bằng Super Auto-Discovery & Ecosystem Catalog
+
+1. **Super Auto-Discovery (Zero-Config Onboarding):**
+   - Chỉ cần nhập 1 Root Domain (ví dụ `shop-demo.vn`).
+   - Tự động truy vấn Certificate Transparency Logs (crt.sh API) để phát hiện tất cả subdomain: `api.`, `admin.`, `mail.`, `cdn.`, `staging.`.
+   - Quét mã nguồn HTML/JS để tự động nhận diện Third-party Services (VNPay, MoMo, Google Analytics, Intercom).
+2. **Thư viện Dịch Vụ 1-Click (1-Click Ecosystem Templates):**
+   - Cung cấp sẵn các mẫu cấu hình chuẩn cho hệ sinh thái Việt Nam: VNPay, MoMo, ZaloPay, Mắt Bão ProMail, Mắt Bão Cloud VPS, AWS RDS, Supabase, Cron Backup.
+   - Người dùng bấm chọn template là toàn bộ thông số giám sát, đầu mối liên hệ và mẫu ticket tương ứng được tự động điền.
 
 ---
 

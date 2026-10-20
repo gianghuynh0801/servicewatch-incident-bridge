@@ -4,12 +4,23 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "worker": "node -e \"require('./engine').runProbeCycle().then(() => console.log('Probe worker executed successfully'))\"",
+    "heartbeat:check": "node -e \"require('./engine').evaluateHeartbeats(); console.log('Heartbeat audit completed')\"",
+    "cron": "node server.js",
+    "test": "node test-workflow.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "sre",
+    "incident-bridge",
+    "observability",
+    "dns-monitor",
+    "ai-copilot",
+    "self-healing"
+  ],
+  "author": "ServiceWatch Team",
+  "license": "MIT",
+  "description": "Nền tảng tự động điều phối & cầu nối xử lý sự cố hạ tầng số đa tầng",
   "dependencies": {
     "better-sqlite3": "^13.0.3",
     "express": "^5.2.1"

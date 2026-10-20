@@ -3,659 +3,944 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ServiceWatch · Cầu Nối Xử Lý Sự Cố Hạ Tầng Số</title>
+  <title>ServiceWatch · Tiện Ích Điều Phối &amp; Giám Sát Sự Cố Hạ Tầng Số Đa Tầng</title>
+  <meta name="description" content="Dự án tiện ích cá nhân & mã nguồn mở tự động điều phối & cầu nối xử lý sự cố hạ tầng số đa tầng. Phát hiện lỗi trong 8s, tự động cô lập nguyên nhân gốc và chuẩn hóa ticket gửi nhà cung cấp dịch vụ.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="logo.svg">
-  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="landing.css?v=6">
 </head>
-<body>
+<body class="lp-body">
 
-  <!-- Top App Navigation -->
-  <header class="app-header">
-    <div class="header-inner">
+  <!-- Ambient Backdrop Glow -->
+  <div class="lp-ambient" aria-hidden="true"></div>
+
+  <!-- Header Navigation -->
+  <header class="lp-header">
+    <div class="lp-container lp-header-inner">
       <!-- Brand & Product Identity -->
-      <div class="brand-group">
-        <div class="brand-mark-wrapper" title="ServiceWatch · Digital Infrastructure Incident Bridge">
-          <img src="logo.svg" alt="ServiceWatch Logo" width="40" height="40" class="brand-logo-img">
-        </div>
-        <div class="brand-meta">
-          <div class="brand-title">
-            <span class="brand-name">Service<span class="brand-name-accent">Watch</span></span>
-            <span class="brand-env">v1.2 Pro</span>
+      <a href="/" class="lp-brand" title="ServiceWatch · Vibe Code Challenge 2026">
+        <img src="logo.svg" alt="ServiceWatch Logo" width="36" height="36" class="lp-logo-img">
+        <div class="lp-brand-text">
+          <div class="lp-brand-title">
+            <span>SERVICE<span class="lp-brand-accent">WATCH</span></span>
+            <span class="lp-brand-badge">TIỆN ÍCH SRE</span>
           </div>
-          <span class="brand-sub">Cầu Nối Điều Phối Sự Cố · Tối Ưu Cho Mắt Bão Cloud</span>
+          <span class="lp-brand-sub">Tiện Ích Ứng Cứu Hạ Tầng Số Đa Tầng</span>
         </div>
-      </div>
+      </a>
 
-      <!-- Segmented Navigation Tabs -->
-      <nav class="nav-segmented" id="navTabs">
-        <button class="nav-item active" data-tab="tab-overview">
-          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
-            <rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>
-          </svg>
-          <span>Tổng quan</span>
-        </button>
-        <button class="nav-item" data-tab="tab-incidents">
-          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-          <span>Sự cố & Ticket</span>
-          <span class="badge-count" id="navIncidentBadge" style="display:none;">1</span>
-        </button>
-        <button class="nav-item" data-tab="tab-playbook">
-          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"/>
-            <path d="M6 6h10M6 10h10"/>
-          </svg>
-          <span>Sổ tay Ứng cứu</span>
-        </button>
-        <button class="nav-item" data-tab="tab-assets">
-          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <ellipse cx="12" cy="5" rx="9" ry="3"/>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-            <path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/>
-          </svg>
-          <span>Quản lý Tài sản</span>
-        </button>
-        <button class="nav-item" data-tab="tab-logs">
-          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-            <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
-          </svg>
-          <span>Nhật ký Kiểm toán</span>
-        </button>
+      <!-- Navigation Menu (Neat, Horizontal, No Wrapping) -->
+      <nav class="lp-nav">
+        <a href="#features" class="lp-nav-link">Tính Năng</a>
+        <a href="#domainScanner" class="lp-nav-link">Quét Tên Miền</a>
+        <a href="#ai-simulator" class="lp-nav-link">Mô Phỏng AI</a>
+        <a href="#architecture" class="lp-nav-link">Kiến Trúc</a>
+        <a href="#comparison" class="lp-nav-link">So Sánh</a>
+        <a href="#faq" class="lp-nav-link">FAQ</a>
       </nav>
 
-      <!-- Right Header Actions & Controls -->
-      <div class="header-actions">
-        <!-- Theme Switcher Button -->
-        <button id="themeToggleBtn" class="btn btn-sm btn-secondary" title="Chuyển chế độ Giao diện Sáng / Tối">
-          <svg id="themeIconSun" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
-            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-          </svg>
-          <svg id="themeIconMoon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-          <span id="themeToggleLabel">Tối</span>
+      <!-- Action Buttons -->
+      <div class="lp-header-actions">
+        <!-- Theme Toggle -->
+        <button id="themeToggleBtn" class="lp-btn lp-btn-sm lp-btn-secondary" title="Chuyển đổi giao diện Sáng / Tối">
+          <span id="themeToggleIcon" style="display:inline-flex; align-items:center;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg></span>
         </button>
 
-        <!-- Chaos Simulation Dropdown & Control -->
-        <div class="chaos-pill-control">
-          <span class="status-indicator" id="chaosIndicator"></span>
-          <select id="chaosTypeSelect" class="form-select-sm" title="Chọn kịch bản kiểm thử tự động cho BGK">
-            <option value="dns_servfail">Mô phỏng: DNS SERVFAIL</option>
-            <option value="http_503">Mô phỏng: Hosting 503</option>
-          </select>
-          <button id="toggleChaosBtn" class="btn btn-sm btn-chaos" title="Kích hoạt kiểm chứng tự động">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-            </svg>
-            <span id="chaosBtnLabel">Giả Lập Lỗi</span>
-          </button>
-        </div>
-
-        <button id="triggerProbeBtn" class="btn btn-sm btn-secondary" title="Kích hoạt lượt quét tức thời">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+        <!-- Auth & Demo Buttons -->
+        <button id="loginBtn" class="lp-btn lp-btn-sm lp-btn-secondary" title="Đăng nhập quản trị viên hoặc ban giám khảo">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
           </svg>
-          <span>Quét</span>
+          <span>Đăng Nhập</span>
         </button>
+
+        <a href="/dashboard" class="lp-btn lp-btn-sm lp-btn-demo" title="Truy cập trực tiếp Dashboard giám sát hạ tầng">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Vào SRE Dashboard</span>
+        </a>
       </div>
     </div>
   </header>
 
-  <!-- Notification Bar for Active Incidents (Chớp chớp rung rung & Kênh báo động) -->
-  <div id="activeIncidentAlert" class="incident-banner" style="display: none;">
-    <div class="banner-inner">
-      <div class="banner-icon-wrapper">
-        <div class="beacon-ripple"></div>
-        <div class="banner-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-        </div>
+  <!-- Hero Section -->
+  <section class="lp-hero">
+    <div class="lp-container">
+      <div class="lp-hero-eyebrow">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg><span>VIBE CODE CHALLENGE 2026 · TIỆN ÍCH QUẢN TRỊ HẠ TẦNG SỐ CÁ NHÂN</span>
       </div>
-      <div class="banner-body">
-        <div class="banner-header-line">
-          <span class="live-alarm-tag">
-            <span class="ping-circle"></span>
-            BÁO ĐỘNG
-          </span>
-          <span class="banner-title" id="alertTitle">Web Hosting Bị Quá Tải (HTTP 503)</span>
-          <span class="banner-status-tag" id="alertStatusTag">Đã Soạn Ticket Mắt Bão</span>
+      
+      <h1 class="lp-hero-title lp-heading">
+        Cầu Nối Điều Phối &amp; Ứng Cứu Sự Cố <br>
+        <span class="lp-gradient-text">Hạ Tầng Số Tự Động</span>
+      </h1>
+
+      <p class="lp-hero-desc">
+        Tiện ích cá nhân giám sát đa tầng DNS, Hosting, Mail, SSL. Cô lập sự cố sau <strong>8 giây</strong> và tự soạn ticket chuẩn gửi nhà cung cấp dịch vụ.
+      </p>
+
+      <div class="lp-hero-cta-group">
+        <a href="/dashboard" class="lp-btn lp-btn-lg lp-btn-primary-gradient" id="heroCtaPrimary" title="Truy cập ngay bản demo giám sát">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Trải Nghiệm SRE Dashboard (1-Click)</span>
+        </a>
+
+        <button class="lp-btn lp-btn-lg lp-btn-secondary" id="heroCtaScan" title="Kiểm tra ngay tên miền của bạn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Quét Hạ Tầng Tên Miền</span>
+        </button>
+
+        <button class="lp-btn lp-btn-lg lp-btn-ghost" id="heroCtaWhitepaper" title="Xem tài liệu đặc tả PRD và kiến trúc">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>Tài Liệu Kỹ Thuật (PRD)</span>
+        </button>
+      </div>
+
+      <!-- Live Domain Scanner (Interactive Widget) -->
+      <div class="lp-scanner-card" id="domainScanner">
+        <div class="lp-scanner-header">
+          <div class="lp-scanner-title">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            <span>Bộ Quét Khám Phá Tài Sản Số &amp; Lập Sơ Đồ Phụ Thuộc</span>
+          </div>
+          <span style="font-size:12px; color:var(--lp-text-tertiary);">Live Discovery API · Tự Động Định Danh Provider</span>
         </div>
-        <div class="banner-subline">
-          <span id="alertDesc">Website đang gián đoạn · Đã báo qua Telegram (0.4s) & Mail</span>
-          <button class="channel-link-btn" onclick="openAlertChannelsModal()" title="Xem chi tiết hoặc kiểm tra các kênh báo động">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span>Kênh báo động</span>
+
+        <div class="lp-scanner-form">
+          <input type="text" id="scannerDomainInput" class="lp-scanner-input lp-mono" placeholder="Nhập tên miền (ví dụ: matbao.com hoặc vibehost.matbao.ai)" value="matbao.com">
+          <button id="btnRunScan" class="lp-btn lp-btn-primary" title="Chạy phân tích đa tầng">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span>Quét Phân Tích Ngay</span>
           </button>
         </div>
+
+        <!-- Quick Sample Chips -->
+        <div class="lp-quick-tags">
+          <span>Gợi ý tên miền mẫu:</span>
+          <button type="button" class="lp-tag-btn" data-domain="matbao.com">matbao.com</button>
+          <button type="button" class="lp-tag-btn" data-domain="vibehost.matbao.ai">vibehost.matbao.ai</button>
+          <button type="button" class="lp-tag-btn" data-domain="cloud.matbao.net">cloud.matbao.net</button>
+          <button type="button" class="lp-tag-btn" data-domain="test-store.vn">test-store.vn</button>
+        </div>
+
+        <!-- Scan Result Grid -->
+        <div class="lp-scanner-result" id="scannerResultBox">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:13px; font-weight:700; color:var(--lp-text-primary); display:flex; align-items:center; gap:8px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#059669;"></span>
+              <span>Kết Quả Lập Bản Đồ: <span id="resDomainName" class="lp-mono" style="color:var(--lp-blue);">matbao.com</span></span>
+            </div>
+            <div id="resProvider" style="font-size:11.5px; font-weight:600; padding:2px 10px; border-radius:999px; background:var(--lp-blue-subtle); color:var(--lp-blue); border:1px solid var(--lp-blue-border);">
+              Nhà Cung Cấp Dịch Vụ Hạ Tầng
+            </div>
+          </div>
+
+          <div class="lp-scan-grid">
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">MÁY CHỦ WEB (A RECORD)</div>
+              <div class="lp-scan-val lp-mono" id="resIp">103.110.128.76</div>
+            </div>
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">VÒNG ĐỜI TÊN MIỀN (RDAP WHOIS)</div>
+              <div class="lp-scan-val" id="resExpiry">
+                <span class="lp-badge blue"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Đăng ký: 2002</span>
+                <span class="lp-badge emerald">Hạn dùng: 2028 (Còn 538 ngày)</span>
+              </div>
+            </div>
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">TRẠNG THÁI HTTP &amp; BẢO MẬT SSL</div>
+              <div class="lp-scan-val">
+                <span id="resHttp"><span class="lp-badge emerald">200 OK</span></span>
+                <span id="resSsl"><span class="lp-badge emerald"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:2px;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>TLS 1.3 Hợp Lệ</span></span>
+              </div>
+            </div>
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">CÔNG NGHỆ WEB &amp; CMS NHẬN DIỆN</div>
+              <div class="lp-scan-val" id="resTech">
+                <span class="lp-badge purple">Nginx Web Server</span>
+                <span class="lp-badge blue">Next.js / React</span>
+              </div>
+            </div>
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">MÁY CHỦ PHÂN GIẢI (NAMESERVERS DNS)</div>
+              <div class="lp-scan-val lp-mono" id="resNs">ns1.matbao.com, ns2.matbao.com</div>
+            </div>
+            <div class="lp-scan-item">
+              <div class="lp-scan-label">HỘP THƯ DOANH NGHIỆP (MX RECORD)</div>
+              <div class="lp-scan-val lp-mono" id="resMx">mx.matbao.email</div>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:12.5px; color:var(--lp-text-secondary); display:flex; align-items:center; gap:6px;">
+              <span>Độ trễ trung bình:</span>
+              <strong id="resLatency" class="lp-mono" style="color:var(--lp-emerald);">18ms</strong>
+              <span style="color:var(--lp-text-tertiary);">· Kết nối tối ưu</span>
+            </div>
+            <button id="btnOnboardScanned" class="lp-btn lp-btn-sm lp-btn-primary-gradient" title="Tự động thêm vào danh mục tài sản giám sát SRE">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg><span>Đưa Vào Hệ Thống Giám Sát SRE</span>
+            </button>
+          </div>
+
+          <!-- Live Onboarding Telemetry Pipeline (Hiển thị tiến trình trực quan, thay thế icon xoay) -->
+          <div id="onboardProgressBox" class="lp-onboard-pipeline" style="display:none;">
+            <div class="lp-pipeline-header">
+              <div class="lp-pipeline-title">
+                <span class="lp-pulse-dot"></span>
+                <span id="onboardStepText">Đang phân tích cấu trúc DNS &amp; Topology...</span>
+              </div>
+              <span id="onboardStepPercent" class="lp-pipeline-percent">30%</span>
+            </div>
+            <div class="lp-progress-track">
+              <div id="onboardProgressBar" class="lp-progress-bar" style="width: 30%;">
+                <div class="lp-progress-glow"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="banner-actions">
-        <button class="btn btn-sm btn-primary" onclick="switchTab('tab-incidents')" title="Xem chi tiết bằng chứng và gửi Ticket cho Mắt Bão">
-          Duyệt & Gửi Ticket
-        </button>
-        <button class="btn btn-sm btn-secondary" onclick="switchTab('tab-playbook')" title="Mở các phương án ứng cứu khẩn cấp">
-          Ứng Cứu Nhanh
-        </button>
+
+      <!-- Real-Time Metrics & Trust Bar -->
+      <div class="lp-trust-bar">
+        <div class="lp-trust-item">
+          <div class="lp-trust-number">8 Giây</div>
+          <div class="lp-trust-desc">Chu kỳ giám sát đa tầng ngầm</div>
+        </div>
+        <div class="lp-trust-item">
+          <div class="lp-trust-number">3 Vùng</div>
+          <div class="lp-trust-desc">Quorum xác thực chống báo động giả</div>
+        </div>
+        <div class="lp-trust-item">
+          <div class="lp-trust-number">1.1 Giây</div>
+          <div class="lp-trust-desc">AI SRE chuẩn đoán nguyên nhân gốc</div>
+        </div>
+        <div class="lp-trust-item">
+          <div class="lp-trust-number">85%</div>
+          <div class="lp-trust-desc">Giảm thời gian gián đoạn MTTR</div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Main View Area -->
-  <main class="app-viewport">
-    
-    <!-- TAB 1: OVERVIEW & TOPOLOGY MAP -->
-    <section id="tab-overview" class="view-panel active">
+  <!-- Core Features Section -->
+  <section class="lp-section" id="features" style="background: var(--lp-surface-subtle);">
+    <div class="lp-container">
+      <div class="lp-section-header">
+        <span class="lp-section-tag">Tính Năng Tiện Ích</span>
+        <h2 class="lp-section-title lp-heading">4 Trụ Cột Tự Động Hóa Vận Hành Cho SysAdmin &amp; SME</h2>
+        <p class="lp-section-desc">
+          Giải quyết dứt điểm bài toán sập web, lỗi mail và gián đoạn vận hành.
+        </p>
+      </div>
 
-      <!-- Business Health Shield Banner (UX for Non-tech Owners) -->
-      <div class="business-shield-card healthy" id="businessShield">
-        <div class="shield-left">
-          <div class="shield-icon-badge" id="shieldIconBadge">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
-          </div>
-          <div class="shield-content">
-            <h2 id="shieldTitle">Hạ Tầng Doanh Nghiệp Đang Hoạt Động An Toàn 100%</h2>
-            <p id="shieldDesc">Website bán hàng, hòm thư nhận đơn và bảo mật số của bạn đang mở cửa 24/7 đón khách hàng ổn định.</p>
+      <div class="lp-feature-grid">
+        <!-- Feature 1: Asset Management & Dependency Map -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon blue"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><line x1="6" y1="9" x2="6" y2="15"/><line x1="18" y1="9" x2="18" y2="15"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="9" y1="18" x2="15" y2="18"/></svg></div>
+          <h3 class="lp-feature-title">Bản Đồ Phụ Thuộc Tài Sản Số</h3>
+          <p class="lp-feature-desc">
+            Lập danh mục Domain, DNS, Web, Mail, SSL và trực quan hóa hiệu ứng sự cố domino.
+          </p>
+          <div class="lp-feature-action">
+            <a href="/dashboard" class="lp-btn lp-btn-sm lp-btn-secondary" title="Xem sơ đồ trong Dashboard">
+              Xem Bản Đồ Trong Dashboard →
+            </a>
           </div>
         </div>
-        <div class="shield-quick-pills" id="shieldPills">
-          <div class="quick-pill ok" id="pillWeb">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Web Bán Hàng: Hoạt động</span>
+
+        <!-- Feature 2: Multi-Probe Telemetry -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon emerald"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.93 4.93a10 10 0 0 1 14.14 0"/><path d="M7.76 7.76a6 6 0 0 1 8.48 0"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="14" x2="12" y2="22"/></svg></div>
+          <h3 class="lp-feature-title">Giám Sát Đa Tầng 8 Giây</h3>
+          <p class="lp-feature-desc">
+            Kiểm tra sâu DNS UDP 53, Handshake SSL, mã HTTP và xung nhịp Heartbeat mỗi 8 giây.
+          </p>
+          <div class="lp-feature-action">
+            <a href="/dashboard" class="lp-btn lp-btn-sm lp-btn-secondary" title="Xem chi tiết các Probe">
+              Xem Bảng Probe Đa Tầng →
+            </a>
           </div>
-          <div class="quick-pill ok" id="pillMail">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Email Công Ty: Thông suốt</span>
+        </div>
+
+        <!-- Feature 3: Anti-False Alarm & Quorum -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+          <h3 class="lp-feature-title">Cơ Chế Chống Báo Động Giả</h3>
+          <p class="lp-feature-desc">
+            Loại bỏ báo động ảo nhờ thuật toán đồng thuận từ 3 Resolver (VNPT, Viettel, Cloudflare) độc lập.
+          </p>
+          <div class="lp-feature-action">
+            <a href="#architecture" class="lp-btn lp-btn-sm lp-btn-secondary">
+              Xem Thuật Toán Đồng Thuận →
+            </a>
           </div>
-          <div class="quick-pill ok" id="pillSsl">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Bảo Mật SSL: An toàn</span>
+        </div>
+
+        <!-- Feature 4: Auto Ticket Composer -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon amber"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
+          <h3 class="lp-feature-title">Tự Soạn Ticket Chuẩn Kỹ Thuật</h3>
+          <p class="lp-feature-desc">
+            Tự phân loại lỗi, định tuyến đúng nhà cung cấp dịch vụ và đính kèm sẵn đầy đủ log kỹ thuật.
+          </p>
+          <div class="lp-feature-action">
+            <a href="/dashboard" class="lp-btn lp-btn-sm lp-btn-secondary">
+              Xem Mẫu Ticket Kỹ Thuật →
+            </a>
+          </div>
+        </div>
+
+        <!-- Feature 5: Emergency Playbook -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon rose"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg></div>
+          <h3 class="lp-feature-title">Sổ Tay Ứng Cứu Khẩn Cấp</h3>
+          <p class="lp-feature-desc">
+            Bật trang bảo trì tĩnh, rollback DNS về snapshot an toàn và phát cảnh báo khẩn cấp.
+          </p>
+          <div class="lp-feature-action">
+            <a href="/dashboard" class="lp-btn lp-btn-sm lp-btn-secondary">
+              Mở Sổ Tay Ứng Cứu →
+            </a>
+          </div>
+        </div>
+
+        <!-- Feature 6: AI SRE Copilot & Chaos Lab -->
+        <div class="lp-feature-card">
+          <div class="lp-feature-icon purple"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg></div>
+          <h3 class="lp-feature-title">Trợ Lý AI SRE &amp; Chaos Lab</h3>
+          <p class="lp-feature-desc">
+            Google Gemini phân tích sự cố sau 1 giây kèm Chaos Lab giả lập lỗi trực tiếp.
+          </p>
+          <div class="lp-feature-action">
+            <a href="#ai-simulator" class="lp-btn lp-btn-sm lp-btn-secondary">
+              Thử Nghiệm Mô Phỏng AI →
+            </a>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- High-level Metric Cards (Enhanced Contrast & Professional Integration Hub) -->
-      <div class="metrics-row">
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Dịch Vụ Đang Quản Lý</span>
-            <div class="metric-icon-box" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/>
-                <line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/>
-              </svg>
-            </div>
+  <!-- Interactive AI SRE Simulator Section -->
+  <section class="lp-section" id="ai-simulator">
+    <div class="lp-container">
+      <div class="lp-section-header">
+        <span class="lp-section-tag">Trải Nghiệm Tương Tác SRE</span>
+        <h2 class="lp-section-title lp-heading">AI SRE Copilot: Chuẩn Đoán Sự Cố Sau 1 Giây</h2>
+        <p class="lp-section-desc">
+          Nhấp vào các kịch bản sự cố kinh điển dưới đây để xem cách Trí Tuệ Nhân Tạo bóc tách dữ liệu đo lường đa tầng, xác định nguyên nhân gốc và tự động sinh giải pháp ứng cứu:
+        </p>
+      </div>
+
+      <div class="lp-ai-simulator-card" id="aiSimulatorCard">
+        <!-- Scenario Switcher Tabs -->
+        <div class="lp-ai-tabs">
+          <button class="lp-ai-tab-btn active" data-scenario="dns">
+            <span class="scenario-dot red"></span> Kịch Bản 1: Mất Sổ Địa Chỉ Tên Miền (DNS SERVFAIL)
+          </button>
+          <button class="lp-ai-tab-btn" data-scenario="http">
+            <span class="scenario-dot amber"></span> Kịch Bản 2: Quá Tải Cửa Hàng Web (Hosting 503)
+          </button>
+          <button class="lp-ai-tab-btn" data-scenario="ssl">
+            <span class="scenario-dot yellow"></span> Kịch Bản 3: Hết Hạn Giấy Phép An Toàn (SSL Lỗi Đỏ)
+          </button>
+          <button class="lp-ai-tab-btn" data-scenario="heartbeat">
+            <span class="scenario-dot blue"></span> Kịch Bản 4: Mất Mạch Đập Kho Dữ Liệu (Database Treo)
+          </button>
+        </div>
+
+        <!-- Scenario Header & View Mode Switcher -->
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+          <div>
+            <span class="lp-badge purple" id="aiScenarioTag" style="font-size:11px; font-weight:700; margin-right:8px;">CẤP CỨU DNS AUTHORITATIVE</span>
+            <strong id="aiScenarioTitle" style="font-size:15px; color:var(--lp-text-primary);">DNS Authoritative SERVFAIL · Tê Liệt Toàn Bộ Hệ Thống</strong>
           </div>
-          <div class="metric-body">
-            <span class="metric-value" id="kpiTotalAssets">5</span>
-            <span class="metric-trend">Tên miền, VPS, Email, SSL</span>
+
+          <!-- View Mode Toggle (Doanh Nghiệp vs Kỹ Thuật) -->
+          <div class="lp-ai-view-toggle">
+            <button class="lp-view-mode-btn active" data-mode="hybrid" id="btnModeHybrid" title="Hiển thị cả giải thích dễ hiểu lẫn dữ liệu kỹ thuật">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Song Song</span>
+            </button>
+            <button class="lp-view-mode-btn" data-mode="nontech" id="btnModeNonTech" title="Chỉ xem giải thích dễ hiểu và tác động kinh doanh">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>Góc Nhìn Doanh Nghiệp</span>
+            </button>
+            <button class="lp-view-mode-btn" data-mode="tech" id="btnModeTech" title="Chuyên sâu log kỹ thuật và mã lệnh DevOps">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              <span>Kỹ Thuật SRE</span>
+            </button>
           </div>
         </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Độ Ổn Định Kinh Doanh (SLA)</span>
-            <div class="metric-icon-box" style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-              </svg>
+        <!-- Split Grid: Telemetry In vs AI Diagnostic Out -->
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:20px;">
+          <!-- Left: Telemetry & Plain Language Explanation -->
+          <div class="lp-ai-preview-box">
+            <!-- Non-tech Plain Language Summary -->
+            <div class="lp-nontech-card lp-nontech-only">
+              <div class="lp-nontech-header">
+                <span class="lp-nontech-title">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  GIẢI THÍCH DỄ HIỂU (NON-TECH)
+                </span>
+                <span class="lp-badge blue" style="font-size:10px; padding:2px 7px;">Cho Người Không Rành IT</span>
+              </div>
+              <div class="lp-nontech-desc" id="aiNonTechTelemetry">
+                Hệ thống kiểm tra tự động từ 3 nhà mạng viễn thông lớn tại Việt Nam (VNPT, Viettel, Cloudflare). Cả 3 nơi đều báo mất tín hiệu với máy chủ tên miền của bạn sau 3 giây chờ đợi.
+              </div>
             </div>
-          </div>
-          <div class="metric-body">
-            <span class="metric-value status-text-healthy" id="kpiHealthStatus">100%</span>
-            <span class="metric-trend" id="kpiHealthDetail">Toàn bộ kênh thông suốt</span>
-          </div>
-        </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Sự Cố Cần Can Thiệp</span>
-            <div class="metric-icon-box" style="background:#fff7ed; color:#ea580c; border:1px solid #fed7aa;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-              </svg>
+            <!-- Raw SRE Telemetry Log Stream -->
+            <div class="lp-tech-only">
+              <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em; display:flex; justify-content:space-between; align-items:center;">
+                <span>DỮ LIỆU ĐO LƯỜNG THỰC TẾ (TELEMETRY LOGS)</span>
+                <span class="lp-mono" style="font-size:10px; color:var(--lp-text-muted);">RAW SRE OUTPUT</span>
+              </div>
+              <pre class="lp-mono" id="aiTelemetrySnippet" style="font-size:11.5px; line-height:1.6; color:var(--lp-text-primary); white-space:pre-wrap; background:rgba(0,0,0,0.03); border:1px solid var(--lp-border); border-radius:8px; padding:12px; overflow-x:auto;">
+[PROBE CYCLE #8841] MULTI-RESOLVER CROSS-CHECK
+Resolver 1 (VNPT 203.162.4.190): SERVFAIL (Query matbao.com)
+Resolver 2 (Viettel 203.113.131.1): SERVFAIL
+Resolver 3 (Cloudflare 1.1.1.1): SERVFAIL (Status: REFUSED)
+Authoritative NS [ns1.matbao.com] -> Timeout after 3000ms
+Cascade Impact Detected: Website HTTP Handshake Broken (502 Bad Gateway) + MX Mail Delivery Blocked</pre>
             </div>
           </div>
-          <div class="metric-body">
-            <span class="metric-value" id="kpiOpenIncidents">0</span>
-            <span class="metric-trend">Chu kỳ giám sát: 8 giây/lần</span>
-          </div>
-        </div>
 
-        <div class="metric-card">
-          <div class="metric-header">
-            <span class="metric-title">Cổng Tích Hợp (Provider Hub)</span>
-            <div class="metric-icon-box" style="background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 16v1a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/>
-                <path d="M18 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4"/>
-                <circle cx="8" cy="12" r="2"/>
-              </svg>
-            </div>
-          </div>
-          <div class="metric-body" style="flex-direction:column; align-items:flex-start; gap:4px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span style="font-size:17px; font-weight:700; color:var(--text-primary);">Mắt Bão Ecosystem</span>
-              <span class="badge-status badge-healthy" style="font-size:10.5px; padding:2px 7px;">
-                <span class="badge-dot"></span>Đã kết nối
+          <!-- Right: AI Root Cause Analysis & Non-tech Impact -->
+          <div class="lp-ai-preview-box" style="border-color:var(--lp-purple-border); background:var(--lp-surface);">
+            <div style="font-size:11.5px; font-weight:700; color:var(--lp-purple); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+              <span style="display:inline-flex; align-items:center; gap:6px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>PHÂN TÍCH TỰ ĐỘNG BỞI AI SRE COPILOT</span>
               </span>
+              <div style="font-size:11.5px; color:var(--lp-text-tertiary); display:flex; align-items:center; gap:8px;">
+                <span>Mô hình: <strong id="aiMetaModel" style="color:var(--lp-purple);">Gemini 2.0 Flash</strong></span>
+                <span>Tốc độ: <strong id="aiMetaLatency" class="lp-mono" style="color:var(--lp-emerald);">1.1s</strong></span>
+              </div>
             </div>
-            <span class="metric-trend" style="font-size:12px; color:var(--text-secondary);">
-              Cầu nối Ticket & Tra cứu ONS 24/7
-            </span>
-          </div>
-        </div>
-      </div>
 
-      <!-- Dependency Map Card -->
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Bản Đồ Phụ Thuộc Tài Sản Số (Digital Asset Dependency Map)</h3>
-            <span class="header-desc">Nhận diện mối liên kết giữa Tên miền, DNS Provider và các dịch vụ Web, Hộp thư, Chứng chỉ</span>
-          </div>
-          <div class="badge-status badge-healthy" id="mapStatusBadge">
-            <span class="badge-dot"></span>
-            <span id="mapStatusText">Hạ Tầng Ổn Định</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="plain-lang-tip">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-            </svg>
-            <div>
-              <strong>Hiểu nhanh cho Doanh nghiệp:</strong> Tên miền đóng vai trò cửa ngõ chính. Nếu máy chủ tên miền gặp lỗi, toàn bộ Website bán hàng, Hộp thư email và API bên dưới sẽ bị ngắt kết nối đồng loạt (hiệu ứng sập liên đới). Sơ đồ bên dưới giúp bạn thấy ngay mắt xích nào đang bị ảnh hưởng.
+            <!-- Non-tech Business Meaning & Impact -->
+            <div class="lp-nontech-card purple-theme lp-nontech-only">
+              <div class="lp-nontech-header">
+                <span class="lp-nontech-title purple">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  GÓC NHÌN DOANH NGHIỆP &amp; TÁC ĐỘNG KINH DOANH
+                </span>
+                <span class="lp-badge purple" style="font-size:10px; padding:2px 7px;">Dành Cho Quản Lý</span>
+              </div>
+
+              <div style="font-size:12.5px; margin-bottom:8px; line-height:1.5;">
+                <strong style="color:var(--lp-text-primary);">Hiện tượng mắt thấy:</strong>
+                <span id="aiNonTechSymptom" style="color:var(--lp-text-secondary); margin-left:4px;">
+                  Khách hàng gõ tên miền thì không vào được web (trắng trang); nhân viên gửi email cho đối tác bị báo lỗi bật ngược lại.
+                </span>
+              </div>
+
+              <div style="font-size:12.5px; margin-bottom:8px; padding:8px 10px; background:var(--lp-surface); border-radius:6px; border:1px solid var(--lp-border); line-height:1.5;">
+                <strong style="color:var(--lp-purple);">Hình tượng hóa trực quan:</strong>
+                <span id="aiNonTechAnalogy" style="color:var(--lp-text-secondary); margin-left:4px;">
+                  Tên miền giống như cuốn danh bạ điện thoại. Khi máy chủ danh bạ bị sập, dù cửa hàng (website) và hòm thư (email) của bạn vẫn nguyên vẹn nhưng không ai biết số để liên lạc.
+                </span>
+              </div>
+
+              <div style="font-size:12.5px; margin-bottom:8px; line-height:1.5;">
+                <strong style="color:var(--lp-rose);">Rủi ro kinh doanh:</strong>
+                <span id="aiNonTechImpact" style="color:var(--lp-text-secondary); margin-left:4px;">
+                  Khách hàng tưởng doanh nghiệp đóng cửa hoặc lừa đảo; tê liệt hoàn toàn giao dịch mua bán và liên lạc hợp đồng qua email.
+                </span>
+              </div>
+
+              <div style="font-size:12.5px; line-height:1.5;">
+                <strong style="color:var(--lp-emerald);">Cần gọi ai xử lý:</strong>
+                <span id="aiNonTechWhoToCall" style="color:var(--lp-text-primary); font-weight:600; margin-left:4px;">
+                  Báo ngay cho Nhà cung cấp Tên Miền / DNS. Tránh gọi nhầm bên làm web hay hosting vì mã nguồn web hoàn toàn không có lỗi.
+                </span>
+              </div>
             </div>
-          </div>
-          <div class="topology-wrapper" id="topologyTree">
-            <!-- Rendered by app.js -->
-          </div>
-        </div>
-      </div>
 
-      <!-- Live Probe Stream Table -->
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Bằng Chứng Kỹ Thuật Đa Resolver Thời Gian Thực (Multi-Probe Stream)</h3>
-            <span class="header-desc">Đối chiếu kết quả từ Google DNS (8.8.8.8), Cloudflare (1.1.1.1), Quad9 (9.9.9.9) & NS Gốc Mắt Bão</span>
-          </div>
-          <div class="header-tag">
-            <span class="pulse-ring"></span>
-            <span>Live Stream</span>
-          </div>
-        </div>
-        <div class="card-body no-padding">
-          <div style="padding: 14px 20px 0 20px;">
-            <div class="plain-lang-tip" style="margin-bottom: 12px;">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/>
-              </svg>
+            <!-- Technical SRE Details (Root Cause, Ticket, Playbook) -->
+            <div class="lp-tech-only" style="border-top:1px dashed var(--lp-border); padding-top:12px; margin-top:12px;">
+              <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                <span>BẰNG CHỨNG KỸ THUẬT &amp; QUY TRÌNH ỨNG CỨU SRE</span>
+                <span class="lp-mono" style="font-size:10px; color:var(--lp-purple);">DEVOPS SPEC</span>
+              </div>
+
+              <div style="margin-bottom:10px;">
+                <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary);">NGUYÊN NHÂN GỐC (ROOT CAUSE KỸ THUẬT):</div>
+                <div id="aiRootCause" style="font-size:12.5px; font-weight:600; color:var(--lp-text-primary); margin-top:2px;">
+                  Authoritative Nameserver (ns1.matbao.com, ns2.matbao.com) không phản hồi cổng UDP 53. Toàn bộ bản ghi DNS A, MX, CNAME không thể phân giải.
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+                <div>
+                  <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary);">PHẠM VI ẢNH HƯỞNG:</div>
+                  <div id="aiBlastRadius" style="font-size:11.5px; color:var(--lp-text-secondary); margin-top:2px;">
+                    Website sập + Hòm thư giao dịch bị trả thư (Mail Bounced).
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary);">ĐỊNH TUYẾN ĐÚNG PROVIDER:</div>
+                  <div id="aiProvider" style="font-size:11.5px; font-weight:700; color:var(--lp-blue); margin-top:2px;">
+                    Đơn Vị Quản Lý DNS &amp; Tên Miền (Nhà cung cấp dịch vụ)
+                  </div>
+                </div>
+              </div>
+
+              <div style="margin-bottom:10px;">
+                <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary);">TIÊU ĐỀ TICKET TỰ SOẠN GỬI NHÀ CUNG CẤP:</div>
+                <div id="aiTicketPreview" class="lp-mono" style="font-size:11px; background:var(--lp-surface-subtle); padding:6px 10px; border-radius:6px; border:1px solid var(--lp-border); margin-top:4px; color:var(--lp-text-primary);">
+                  [P1-CRITICAL] Authoritative DNS ns1.matbao.com không phân giải record matbao.com
+                </div>
+              </div>
+
               <div>
-                <strong>Bằng chứng chuẩn mực:</strong> Hệ thống tự động lưu giữ các dòng nhật ký kỹ thuật dưới đây. Khi phát hiện sự cố, ServiceWatch sẽ tự động trích xuất các bằng chứng này vào phiếu hỗ trợ gửi Mắt Bão để kỹ sư kiểm tra ngay lập tức, tiết kiệm 90% thời gian hỏi lại qua điện thoại.
+                <div style="font-size:11px; font-weight:700; color:var(--lp-text-tertiary);">HƯỚNG DẪN ỨNG CỨU TỪ PLAYBOOK:</div>
+                <div id="aiPlaybookSteps" style="font-size:11.5px; color:var(--lp-text-secondary); white-space:pre-line; margin-top:4px; line-height:1.5;">
+1. Kiểm tra trạng thái máy chủ Nameserver tại Data Center.
+2. Kích hoạt Secondary DNS Anycast dự phòng.
+3. Gửi thông báo bảo trì khẩn cấp qua kênh ngoài luồng Telegram.
+                </div>
               </div>
             </div>
           </div>
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Thời gian</th>
-                  <th>Resolver / Vùng</th>
-                  <th>Dịch vụ kiểm tra</th>
-                  <th>Giao thức</th>
-                  <th>Mã phản hồi</th>
-                  <th>Độ trễ</th>
-                  <th>Trạng thái</th>
-                  <th>Nhật ký chi tiết (Raw Log)</th>
-                </tr>
-              </thead>
-              <tbody id="probeTableBody">
-                <!-- Injected via JS -->
-              </tbody>
-            </table>
-          </div>
         </div>
-      </div>
-    </section>
 
-    <!-- TAB 2: INCIDENTS & TICKET BRIDGE -->
-    <section id="tab-incidents" class="view-panel">
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Trung Tâm Điều Phối Sự Cố & Cầu Nối Ticket Kỹ Thuật</h3>
-            <span class="header-desc">Tự động gom lỗi, tính toán mức độ nghiêm trọng và tạo phiếu hỗ trợ chuẩn mực</span>
-          </div>
-        </div>
-        <div class="card-body" id="incidentViewContainer">
-          <!-- Loaded via JS -->
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3: EMERGENCY PLAYBOOK -->
-    <section id="tab-playbook" class="view-panel">
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Sổ Tay Ứng Cứu Khẩn Cấp (Business Remediation Playbook)</h3>
-            <span class="header-desc">Các bước xử lý khẩn cấp nhằm bảo vệ khách hàng, giảm thiểu thiệt hại kinh doanh khi hệ thống gián đoạn</span>
-          </div>
-          <div class="badge-status badge-healthy" id="playbookBadge">
-            <span class="badge-dot"></span>
-            <span>Quy Trình Sẵn Sàng</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="playbook-grid" id="playbookActionList">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: ASSETS MANAGEMENT (CRUD) -->
-    <section id="tab-assets" class="view-panel">
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Quản Lý Danh Mục Tài Sản Số</h3>
-            <span class="header-desc">Thao tác Thêm, Sửa, Xóa trực tiếp vào CSDL SQLite theo tiêu chí chấm điểm của cuộc thi</span>
-          </div>
-          <button class="btn btn-sm btn-primary" onclick="openAddAssetModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        <!-- Simulation CTA Button -->
+        <div style="margin-top:20px; display:flex; justify-content:flex-end; align-items:center; gap:12px; flex-wrap:wrap;">
+          <span style="font-size:12px; color:var(--lp-text-secondary);">
+            Ban Giám Khảo muốn xem hệ thống thực sự tạo sự cố và giải quyết trực tiếp trên Dashboard?
+          </span>
+          <button id="btnTriggerChaos" class="lp-btn lp-btn-primary" title="Kích hoạt sự cố này vào SRE Dashboard">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
-            <span>Thêm Dịch Vụ Mới</span>
+            <span>Kích Hoạt Kịch Bản Này Vào SRE Dashboard Thực Tế</span>
           </button>
         </div>
-        <div class="card-body no-padding">
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Tên dịch vụ</th>
-                  <th>Phân loại</th>
-                  <th>Target / IP</th>
-                  <th>Nhà cung cấp</th>
-                  <th>Dịch vụ cha</th>
-                  <th>Cấu hình chuẩn (Baseline)</th>
-                  <th>Trạng thái</th>
-                  <th style="text-align: right;">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody id="assetTableBody">
-                <!-- Injected via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 5: AUDIT LOGS -->
-    <section id="tab-logs" class="view-panel">
-      <div class="card-section">
-        <div class="card-header">
-          <div class="header-titles">
-            <h3>Nhật Ký Kiểm Toán Hệ Thống (Audit Logs)</h3>
-            <span class="header-desc">Ghi vết minh bạch mọi hành vi gửi ticket, kích hoạt giả lập lỗi và thay đổi cơ sở dữ liệu</span>
-          </div>
-        </div>
-        <div class="card-body no-padding">
-          <div class="table-container">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Thời điểm</th>
-                  <th>Hành động</th>
-                  <th>Tác nhân</th>
-                  <th>Chi tiết sự kiện</th>
-                </tr>
-              </thead>
-              <tbody id="auditTableBody">
-                <!-- Injected via JS -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Modal Thêm / Sửa Tài Sản -->
-  <div id="assetModal" class="modal-backdrop" style="display: none;">
-    <div class="modal-box">
-      <div class="modal-box-header">
-        <h4 id="modalTitle">Thêm Dịch Vụ Mới</h4>
-        <button class="btn-close" onclick="closeAssetModal()">&times;</button>
-      </div>
-      <form id="assetForm" onsubmit="handleSaveAsset(event)">
-        <input type="hidden" id="assetId">
-        <div class="modal-box-body">
-          <div class="form-field">
-            <label>Tên dịch vụ / Tên miền (Domain / Web / Mail)</label>
-            <input type="text" id="assetName" class="input-text" placeholder="vd: shop-demo.vn hoặc mail.shop-demo.vn" required>
-          </div>
-          <div class="form-grid-2">
-            <div class="form-field">
-              <label>Loại dịch vụ</label>
-              <select id="assetType" class="input-select" required>
-                <option value="domain">Tên miền gốc (Domain)</option>
-                <option value="website">Website Bán hàng / Web App</option>
-                <option value="hosting">Cloud Hosting / VPS</option>
-                <option value="email">Hộp thư doanh nghiệp (Email Pro)</option>
-                <option value="ssl">Chứng chỉ số SSL</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label>Nhà cung cấp</label>
-              <input type="text" id="assetProvider" class="input-text" placeholder="vd: Mắt Bão" required>
-            </div>
-          </div>
-          <div class="form-field">
-            <label>Địa chỉ IP / Đường dẫn Endpoint</label>
-            <input type="text" id="assetTarget" class="input-text" placeholder="vd: 103.1.1.20 hoặc https://shop-demo.vn" required>
-          </div>
-          <div class="form-field">
-            <label>Dịch vụ cha (Mắt xích phụ thuộc)</label>
-            <select id="assetParentId" class="input-select">
-              <option value="">-- Dịch vụ gốc (Không phụ thuộc dịch vụ khác) --</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label>Cấu hình Baseline an toàn (để phát hiện sai lệch Drift)</label>
-            <input type="text" id="assetBaseline" class="input-text" placeholder="vd: HTTP 200, IP 103.1.1.20">
-          </div>
-        </div>
-        <div class="modal-box-footer">
-          <button type="button" class="btn btn-sm btn-secondary" onclick="closeAssetModal()">Hủy</button>
-          <button type="submit" class="btn btn-sm btn-primary">Lưu Vào CSDL</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Báo Cáo Hậu Sự Cố (Post-mortem) -->
-  <div id="reportModal" class="modal-backdrop" style="display: none;">
-    <div class="modal-box modal-wide">
-      <div class="modal-box-header">
-        <h4>Báo Cáo Tổng Kết Hậu Sự Cố (Post-Incident Report)</h4>
-        <button class="btn-close" onclick="closeReportModal()">&times;</button>
-      </div>
-      <div class="modal-box-body">
-        <div class="markdown-preview" id="reportBody">
-          <!-- Injected via JS -->
-        </div>
-      </div>
-      <div class="modal-box-footer">
-        <button type="button" class="btn btn-sm btn-secondary" onclick="closeReportModal()">Đóng Báo Cáo</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Modal Kênh Cảnh Báo Tức Thời Đa Kênh (Multi-channel Out-of-band Dispatcher) -->
-  <div id="alertChannelsModal" class="modal-backdrop" style="display: none;">
-    <div class="modal-box modal-wide">
-      <div class="modal-box-header">
-        <div style="display:flex; align-items:center; gap:10px;">
-          <div class="modal-icon-badge danger">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+  <!-- SRE Architecture & Workflow Section -->
+  <section class="lp-section" id="architecture" style="background: var(--lp-surface-subtle);">
+    <div class="lp-container">
+      <div class="lp-section-header">
+        <span class="lp-section-tag">Kiến Trúc Kỹ Thuật</span>
+        <h2 class="lp-section-title lp-heading">Quy Trình 4 Bước Khép Kín Theo Chuẩn SRE</h2>
+        <p class="lp-section-desc">
+          Từ phát hiện bất thường đến xác minh phục hồi hoàn toàn tự động, tuân thủ nghiêm ngặt đặc tả PRD.
+        </p>
+      </div>
+
+      <div class="lp-arch-grid">
+        <div class="lp-arch-card">
+          <div class="lp-arch-step">1</div>
+          <h5>Thu Thập Đa Tầng</h5>
+          <p>Worker chạy ngầm định kỳ đo đạc DNS UDP 53, HTTP Handshake, SSL Handshake và Heartbeat Agent nội bộ.</p>
+        </div>
+
+        <div class="lp-arch-card">
+          <div class="lp-arch-step">2</div>
+          <h5>Xác Thực Đa Vùng</h5>
+          <p>Kích hoạt kiểm tra chéo 3 Resolver độc lập (VNPT, Viettel, Cloudflare). Tạo Incident Fingerprint chống trùng lặp.</p>
+        </div>
+
+        <div class="lp-arch-card">
+          <div class="lp-arch-step">3</div>
+          <h5>AI Phân Tích &amp; Soạn Phiếu</h5>
+          <p>Google Gemini phân tích Root Cause, định tuyến đúng nhà cung cấp dịch vụ, tự soạn Draft Ticket và mở Playbook.</p>
+        </div>
+
+        <div class="lp-arch-card">
+          <div class="lp-arch-step">4</div>
+          <h5>Xác Thực Hồi Phục &amp; Báo Cáo</h5>
+          <p>Tự động xác nhận 3 lần Pass liên tiếp từ nhiều zone để đóng sự cố và xuất báo cáo Post-Mortem hoàn chỉnh.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Before vs After Comparison Section -->
+  <section class="lp-section" id="comparison">
+    <div class="lp-container">
+      <div class="lp-section-header">
+        <span class="lp-section-tag">Giá Trị Thực Tế</span>
+        <h2 class="lp-section-title lp-heading">Xử Lý Thủ Công vs. Tiện Ích ServiceWatch</h2>
+        <p class="lp-section-desc">
+          So sánh trực quan sự khác biệt khi đối mặt với sự cố hạ tầng sập ban đêm hoặc ngoài giờ hành chính:
+        </p>
+      </div>
+
+      <div class="lp-compare-grid">
+        <!-- Before: Manual chaos -->
+        <div class="lp-compare-box bad">
+          <div class="lp-compare-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span>Xử Lý Thủ Công Truyền Thống (30–60 phút)</span>
+          </div>
+          <ul class="lp-compare-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink:0; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span><strong>Mù mờ tài sản:</strong> Không rõ website đang trỏ về máy chủ nào, DNS do ai quản trị, mất cả giờ tìm lại hợp đồng.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink:0; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span><strong>Mắng nhầm nhà cung cấp:</strong> Web sập do hosting hết RAM nhưng khách lại gửi ticket mắng đội Tên Miền làm mất thời gian vòng vo.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink:0; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span><strong>Báo cáo mơ hồ:</strong> Khách chỉ gửi yêu cầu <em>"Web của tôi không vào được"</em>, đội ngũ hỗ trợ kỹ thuật phải hỏi đi hỏi lại log, mã lỗi.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" style="flex-shrink:0; margin-top:2px;"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span><strong>Không có sổ tay:</strong> Người quản trị hoảng loạn không biết phải làm gì, doanh thu bán hàng gián đoạn suốt đêm.</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- After: ServiceWatch Automation -->
+        <div class="lp-compare-box good">
+          <div class="lp-compare-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+            <span>Với Tiện Ích ServiceWatch (Tự Động Sau 8 Giây)</span>
+          </div>
+          <ul class="lp-compare-list">
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Bản đồ phụ thuộc sẵn sàng:</strong> Nhìn thấy ngay mắt xích gặp lỗi và lường trước toàn bộ tác động domino.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Định tuyến chính xác 100%:</strong> Phân định rõ ranh giới DNS Failure vs. Hosting 503 để gửi đúng đội ngũ phụ trách.</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Ticket soạn sẵn chuẩn TS/SA:</strong> Tự động đóng gói đầy đủ bằng chứng kỹ thuật (log UDP, curl, resolver status).</span>
+            </li>
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" style="flex-shrink:0; margin-top:2px;"><polyline points="20 6 9 17 4 12"/></svg>
+              <span><strong>Sổ tay cấp cứu tức thì:</strong> Bật trang bảo trì tĩnh và nhận cảnh báo ngoài luồng Telegram ngay cả khi email bị sập.</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="lp-section" id="faq" style="background: var(--lp-surface-subtle);">
+    <div class="lp-container">
+      <div class="lp-section-header">
+        <span class="lp-section-tag">Giải Đáp Thắc Mắc</span>
+        <h2 class="lp-section-title lp-heading">Câu Hỏi Thường Gặp Của Ban Giám Khảo &amp; Người Dùng</h2>
+        <p class="lp-section-desc">
+          Mọi thắc mắc kỹ thuật liên quan đến cơ chế hoạt động, an toàn thông tin và tính tương thích hạ tầng.
+        </p>
+      </div>
+
+      <div class="lp-faq-container">
+        <!-- FAQ 1: Free personal tool -->
+        <div class="lp-faq-item open">
+          <button class="lp-faq-question">
+            <span>1. Tiện ích này có thu phí hoặc tính năng thương mại nào không?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            Hoàn toàn không. Đây là dự án tiện ích cá nhân &amp; công cụ mã nguồn mở phục vụ cộng đồng quản trị viên hệ thống và doanh nghiệp trong khuôn khổ cuộc thi Vibe Code Challenge 2026. Mọi tính năng gồm quét đa tầng, AI Copilot, Sổ tay ứng cứu Playbook và phòng thí nghiệm Chaos đều hoạt động 100% miễn phí.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="lp-faq-item">
+          <button class="lp-faq-question">
+            <span>2. Nền tảng này khác biệt gì so với UptimeRobot, Pingdom hay Datadog?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            Các công cụ truyền thống chỉ đơn thuần báo <em>"Web sập"</em> (Blackbox) mà không thể phân biệt được nguyên nhân là do DNS Authoritative chết, hay do Hosting quá tải HTTP 503, hay do hết hạn SSL. Hậu quả là người dùng thường mắng nhầm nhà cung cấp tên miền. ServiceWatch phân tích quan hệ phụ thuộc đa tầng, định tuyến đúng nhà cung cấp dịch vụ và soạn sẵn phiếu hỗ trợ kỹ thuật kèm đầy đủ bằng chứng kỹ thuật.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="lp-faq-item">
+          <button class="lp-faq-question">
+            <span>3. Cơ chế chống báo động giả (Anti-False Alarm) hoạt động như thế nào?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            Khi phát hiện lỗi lần đầu, hệ thống không vội vàng gửi cảnh báo ngay. Thay vào đó, nó kích hoạt kiểm tra chéo (Quorum) từ 3 Resolver độc lập thuộc các mạng viễn thông lớn tại Việt Nam và quốc tế (VNPT, Viettel, Cloudflare). Chỉ khi có ít nhất 2/3 resolver xác nhận lỗi, sự cố mới được mở chính thức.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="lp-faq-item">
+          <button class="lp-faq-question">
+            <span>4. AI SRE sử dụng mô hình gì và có an toàn dữ liệu không?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            ServiceWatch tích hợp Google Gemini 2.0 Flash qua REST API với kiến trúc Zero-Data-Retention. Hệ thống chỉ gửi thông số kỹ thuật đo lường (mã HTTP, thời gian trễ, phản hồi resolver), tuyệt đối không lưu trữ hay truyền đi mật khẩu, mã khóa riêng (private key) hay dữ liệu kinh doanh nhạy cảm của khách hàng.
+          </div>
+        </div>
+
+        <!-- FAQ 5 -->
+        <div class="lp-faq-item">
+          <button class="lp-faq-question">
+            <span>5. Ban Giám Khảo có thể tự mình kiểm chứng toàn bộ quy trình không?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            Có! Chúng tôi đã trang bị sẵn **Phòng Thí Nghiệm Chaos Engineering (Chaos Lab)** ngay trên thanh điều khiển. Ban Giám Khảo chỉ cần nhấn nút giả lập sự cố (DNS SERVFAIL hoặc HTTP 503), hệ thống sẽ ngay lập tức kích hoạt chu trình: phát hiện trong 8s, AI chuẩn đoán, tự soạn Ticket, mở Sổ tay ứng cứu và tự đóng sự cố khi hệ thống hồi phục.
+          </div>
+        </div>
+
+        <!-- FAQ 6 -->
+        <div class="lp-faq-item">
+          <button class="lp-faq-question">
+            <span>6. Các nhà cung cấp dịch vụ hạ tầng được hưởng lợi gì lớn nhất từ giải pháp này?</span>
+            <svg class="lp-faq-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="lp-faq-answer">
+            Đội ngũ Hỗ trợ Kỹ thuật (TS/SA) của các nhà cung cấp sẽ giảm được hơn 70% số vòng trao đổi hỏi lại thông tin (Back-and-forth communication) nhờ các phiếu Ticket đã được chuẩn hóa kỹ thuật với đầy đủ log traceroute và mã lỗi. Đồng thời, doanh nghiệp sẽ an tâm vận hành trực tuyến với sự bảo vệ 24/7 của ServiceWatch.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner Section -->
+  <section class="lp-section">
+    <div class="lp-container">
+      <div class="lp-cta-card">
+        <h2 class="lp-cta-title">Tự Động Hóa Giám Sát &amp; Ứng Cứu Hạ Tầng Số</h2>
+        <p class="lp-cta-desc">
+          Tiện ích cá nhân mã nguồn mở, trải nghiệm toàn bộ tính năng hoàn toàn miễn phí.
+        </p>
+        <div class="lp-cta-buttons">
+          <a href="/dashboard" class="lp-btn lp-btn-lg lp-btn-cta-white" title="Truy cập ngay bản demo">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
             </svg>
-          </div>
-          <div>
-            <h4>Hệ Thống Cảnh Báo Tức Thời Đa Kênh (Out-of-Band Alerting)</h4>
-            <p style="font-size:12px; color:var(--text-tertiary); margin:0;">Báo động ngay lập tức tới điện thoại & máy tính khi hạ tầng gặp sự cố</p>
-          </div>
+            <span>Truy Cập SRE Dashboard Ngay</span>
+          </a>
+          <button class="lp-btn lp-btn-lg lp-btn-cta-outline" id="whitepaperCta" title="Đọc tài liệu kiến trúc">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Đọc Tài Liệu Kỹ Thuật (PRD)</span>
+          </button>
         </div>
-        <button class="btn-close" onclick="closeAlertChannelsModal()">&times;</button>
-      </div>
-      <div class="modal-box-body">
-        
-        <!-- Lưu ý SRE quan trọng -->
-        <div class="info-alert-box" style="margin-bottom:18px;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <div>
-            <strong>Nguyên tắc SRE cốt lõi:</strong> Khi Tên miền hoặc DNS gặp sự cố, toàn bộ hòm thư công ty (ví dụ: <code>admin@shop-demo.vn</code>) sẽ bị tê liệt đồng loạt. ServiceWatch sử dụng <strong>Kênh cảnh báo ngoài luồng độc lập</strong> để đảm bảo bạn nhận được thông báo chỉ trong <strong>0.5 – 2 giây</strong>!
-          </div>
-        </div>
-
-        <div class="channels-grid">
-          
-          <!-- Kênh 1: Telegram Bot / Zalo OA -->
-          <div class="channel-card">
-            <div class="channel-card-top">
-              <div class="channel-icon telegram">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-              </div>
-              <div class="channel-info">
-                <h5>Telegram Bot / Zalo OA</h5>
-                <span class="status-pill active">Đang hoạt động (Độ trễ: 0.4s)</span>
-              </div>
-            </div>
-            <p class="channel-desc">Bắn tin nhắn thông báo trực tiếp vào điện thoại của Ban Quản Trị qua Telegram Bot <code>@matbao_servicewatch_bot</code>.</p>
-            <div class="channel-action">
-              <button class="btn btn-sm btn-primary" onclick="simulateTelegramAlert()">
-                <span>Bắn Thử Tin Nhắn Telegram</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Kênh 2: Thông Báo Đẩy Trình Duyệt (Web Push) -->
-          <div class="channel-card">
-            <div class="channel-card-top">
-              <div class="channel-icon browser">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              </div>
-              <div class="channel-info">
-                <h5>Thông Báo Đẩy Desktop (Web Push)</h5>
-                <span class="status-pill" id="browserPushStatus">Sẵn sàng kích hoạt</span>
-              </div>
-            </div>
-            <p class="channel-desc">Bật popup chuông báo động trực tiếp trên màn hình Windows / Mac ngay cả khi bạn đang thu nhỏ trình duyệt.</p>
-            <div class="channel-action">
-              <button class="btn btn-sm btn-secondary" onclick="triggerRealDesktopPush()">
-                <span>Kích Hoạt Chuông Báo Desktop</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Kênh 3: Email Dự Phòng Ngoài Luồng -->
-          <div class="channel-card">
-            <div class="channel-card-top">
-              <div class="channel-icon email">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div class="channel-info">
-                <h5>Email Dự Phòng Ngoài Luồng</h5>
-                <span class="status-pill active">Đã thiết lập (admin-backup@gmail.com)</span>
-              </div>
-            </div>
-            <p class="channel-desc">Gửi báo động tới email cá nhân độc lập qua SMTP Gateway riêng biệt, hoàn toàn không phụ thuộc mail server công ty.</p>
-            <div class="channel-action">
-              <button class="btn btn-sm btn-secondary" onclick="simulateEmailAlert()">
-                <span>Kiểm Tra Gửi Mail Dự Phòng</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Kênh 4: App Mắt Bão Mobile (Mắt Bão One) -->
-          <div class="channel-card">
-            <div class="channel-card-top">
-              <div class="channel-icon matbao">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-              </div>
-              <div class="channel-info">
-                <h5>App Di Động Mắt Bão One</h5>
-                <span class="status-pill active">Webhook Provider Hub đã kết nối</span>
-              </div>
-            </div>
-            <p class="channel-desc">Đẩy Push Notification về App Mắt Bão trên điện thoại iOS / Android của khách hàng để mở xem và tạo ticket 1-chạm.</p>
-            <div class="channel-action">
-              <button class="btn btn-sm btn-secondary" onclick="simulateAppPushAlert()">
-                <span>Mô Phỏng Push App Mắt Bão</span>
-              </button>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Khung hiển thị mô phỏng tin nhắn tức thì (Live Preview Terminal) -->
-        <div id="channelPreviewBox" style="display:none; margin-top:20px;">
-          <div class="preview-header">
-            <span id="previewHeaderTitle">Xem trước tin nhắn Telegram Bot</span>
-            <span class="live-dot-pulse">Đã phát tức thời</span>
-          </div>
-          <div class="telegram-phone-mockup" id="previewContent">
-            <!-- Injected via JS -->
-          </div>
-        </div>
-
-      </div>
-      <div class="modal-box-footer">
-        <button type="button" class="btn btn-sm btn-secondary" onclick="closeAlertChannelsModal()">Đóng Cửa Sổ</button>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- App Footer -->
-  <footer class="app-footer">
-    <div class="footer-inner">
-      <div style="display:flex; align-items:center; gap:8px;">
-        <img src="logo.svg" alt="ServiceWatch" width="20" height="20" style="border-radius:5px;">
-        <span><strong>Service<span style="color:var(--accent-primary);">Watch</span></strong> · Cầu Nối Xử Lý Sự Cố Hạ Tầng Số &copy; 2026</span>
-        <span style="margin: 0 4px; opacity:0.3;">|</span>
-        <span>Đồ án tham dự cuộc thi Vibe Code Challenge</span>
+  <!-- Footer -->
+  <footer class="lp-footer">
+    <div class="lp-container">
+      <div class="lp-footer-top">
+        <div style="max-width: 380px;">
+          <div class="lp-brand" style="margin-bottom:12px;">
+            <img src="logo.svg" alt="ServiceWatch Logo" width="32" height="32" class="lp-logo-img">
+            <div class="lp-brand-text">
+              <span class="lp-brand-title">SERVICE<span class="lp-brand-accent">WATCH</span></span>
+              <span class="lp-brand-sub">Tiện Ích Điều Phối &amp; Giám Sát Sự Cố Hạ Tầng</span>
+            </div>
+          </div>
+          <p style="font-size:12.5px; color:var(--lp-text-secondary); line-height:1.6;">
+            Dự án tiện ích cá nhân tự động điều phối &amp; cầu nối xử lý sự cố hạ tầng số đa tầng. Sản phẩm dự thi Vibe Code Challenge 2026.
+          </p>
+        </div>
+
+        <div style="display:flex; gap:40px; flex-wrap:wrap;">
+          <div>
+            <div style="font-size:12px; font-weight:700; color:var(--lp-text-primary); margin-bottom:10px; text-transform:uppercase;">CÔNG CỤ</div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+              <a href="/dashboard" class="lp-nav-link">SRE Dashboard</a>
+              <a href="#domainScanner" class="lp-nav-link">Bộ Quét Tên Miền</a>
+              <a href="#ai-simulator" class="lp-nav-link">Trợ Lý AI SRE</a>
+              <a href="/dashboard#tab-playbook" class="lp-nav-link">Sổ Tay Ứng Cứu</a>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; font-weight:700; color:var(--lp-text-primary); margin-bottom:10px; text-transform:uppercase;">TÀI NGUYÊN</div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+              <a href="javascript:void(0)" onclick="ServiceWatch.openModal('whitepaperModal')" class="lp-nav-link">Tài Liệu Kỹ Thuật (PRD)</a>
+              <a href="#faq" class="lp-nav-link">Câu Hỏi Thường Gặp</a>
+              <a href="#comparison" class="lp-nav-link">Bảng So Sánh</a>
+              <a href="/dashboard#tab-audit" class="lp-nav-link">Nhật Ký Audit SRE</a>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:12px; font-weight:700; color:var(--lp-text-primary); margin-bottom:10px; text-transform:uppercase;">KẾT NỐI</div>
+            <div style="display:flex; flex-direction:column; gap:8px; font-size:13px;">
+              <a href="https://vibehost.matbao.ai" target="_blank" rel="noopener" class="lp-nav-link">Cổng Vibe Host ↗</a>
+              <a href="https://matbao.net" target="_blank" rel="noopener" class="lp-nav-link">Nhà Cung Cấp Tên Miền ↗</a>
+              <a href="/dashboard#tab-chaos" class="lp-nav-link">Phòng Thí Nghiệm Chaos</a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="hotline-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-        </svg>
-        <span>Tổng đài Hỗ trợ Kỹ thuật Mắt Bão: 1900 1830 (24/7)</span>
+
+      <div class="lp-footer-bottom">
+        <div>
+          © 2026 ServiceWatch · Tiện ích cá nhân tham gia Vibe Code Challenge 2026.
+        </div>
+        <div style="display:flex; gap:16px;">
+          <span>Trạng thái: <strong style="color:var(--lp-emerald);">● Hoạt động 100% SLA</strong></span>
+          <span>Phiên bản: <strong>v2.4-SRE-Community</strong></span>
+        </div>
       </div>
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <!-- ==========================================================================
+       MODAL 1: AUTHENTICATION MODAL (Đăng Nhập / Đăng Ký / 1-Click Cho Giám Khảo)
+       ========================================================================== -->
+  <div class="lp-modal-backdrop" id="authModal" style="display:none;">
+    <div class="lp-modal-box">
+      <div class="lp-modal-header">
+        <div class="lp-modal-title" id="authModalTitle">Đăng Nhập Vào Hệ Thống ServiceWatch</div>
+        <button class="lp-modal-close" id="authModalClose" title="Đóng modal">&times;</button>
+      </div>
+
+      <div class="lp-modal-body">
+        <!-- Auth Tabs -->
+        <div class="lp-auth-tabs">
+          <button class="lp-auth-tab active" id="authTabLogin">Đăng Nhập</button>
+          <button class="lp-auth-tab" id="authTabRegister">Đăng Ký Tài Khoản</button>
+        </div>
+
+        <!-- Auth Alert Notice (For unauthenticated redirection or error prompts) -->
+        <div id="landingAuthAlert" style="display:none; margin-bottom:14px; padding:10px 14px; border-radius:8px; font-size:12.5px; line-height:1.5; font-weight:500;"></div>
+
+        <!-- 1-Click Quick Login for Judges -->
+        <div class="lp-quick-logins" style="margin-top:0; margin-bottom:18px; padding-top:0; border-top:none;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--lp-blue); display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:2px;"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg><span>ĐĂNG NHẬP 1-CLICK DÀNH CHO BAN GIÁM KHẢO &amp; TESTER</span>
+          </div>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:8px;">
+            <button type="button" class="lp-btn lp-btn-sm lp-btn-secondary" id="quickBtn_judge" style="font-size:11.5px; padding:6px 8px;" title="Đăng nhập tài khoản Ban Giám Khảo">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg><span>Giám Khảo</span>
+            </button>
+            <button type="button" class="lp-btn lp-btn-sm lp-btn-secondary" id="quickBtn_admin" style="font-size:11.5px; padding:6px 8px;" title="Đăng nhập tài khoản Quản Trị SRE">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>Admin SRE</span>
+            </button>
+            <button type="button" class="lp-btn lp-btn-sm lp-btn-secondary" id="quickBtn_support" style="font-size:11.5px; padding:6px 8px;" title="Đăng nhập tài khoản Kỹ Sư TS/SA">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg><span>Kỹ Sư TS/SA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm">
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="loginIdentifier">Tên Đăng Nhập hoặc Email</label>
+            <input type="text" id="loginIdentifier" class="lp-form-input" placeholder="admin hoặc judge" value="judge" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="loginPassword">Mật Khẩu</label>
+            <input type="password" id="loginPassword" class="lp-form-input" placeholder="Nhập mật khẩu" value="judge123" required>
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="lp-btn lp-btn-primary" style="width:100%; margin-top:10px;">
+            Đăng Nhập
+          </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" style="display:none;">
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="regFullName">Họ và Tên</label>
+            <input type="text" id="regFullName" class="lp-form-input" placeholder="Nguyễn Văn A" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="regUsername">Tên Đăng Nhập</label>
+            <input type="text" id="regUsername" class="lp-form-input" placeholder="username (ít nhất 3 ký tự)" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="regEmail">Địa Chỉ Email</label>
+            <input type="email" id="regEmail" class="lp-form-input" placeholder="name@company.vn" required>
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="regOrg">Tên Doanh Nghiệp / Đơn Vị</label>
+            <input type="text" id="regOrg" class="lp-form-input" placeholder="Công ty TNHH Công Nghệ Mới" value="Doanh Nghiệp Thành Viên">
+          </div>
+
+          <div class="lp-form-group">
+            <label class="lp-form-label" for="regPassword">Mật Khẩu</label>
+            <input type="password" id="regPassword" class="lp-form-input" placeholder="Tối thiểu 6 ký tự" required>
+          </div>
+
+          <button type="submit" id="regSubmitBtn" class="lp-btn lp-btn-primary" style="width:100%; margin-top:10px;">
+            Đăng Ký &amp; Khám Phá Ngay
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 2: WHITEPAPER & PRD MODAL
+       ========================================================================== -->
+  <div class="lp-modal-backdrop" id="whitepaperModal" style="display:none;">
+    <div class="lp-modal-box" style="max-width: 720px; max-height: 85vh; display: flex; flex-direction: column;">
+      <div class="lp-modal-header">
+        <div class="lp-modal-title" style="display:flex; align-items:center; gap:8px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg><span>Tài Liệu Đặc Tả Kỹ Thuật (PRD) · ServiceWatch</span></div>
+        <button class="lp-modal-close" id="whitepaperClose" title="Đóng modal">&times;</button>
+      </div>
+      <div class="lp-modal-body" style="overflow-y: auto; font-size: 13.5px; line-height: 1.65; color: var(--lp-text-secondary);">
+        <h4 style="color:var(--lp-text-primary); margin-bottom:8px;">1. Bối Cảnh &amp; Đề Bài (Problem Statement)</h4>
+        <p>
+          Doanh nghiệp SME vận hành trên hệ sinh thái dịch vụ số phân mảnh: Tên miền, DNS, Web Hosting / Cloud Server, Email doanh nghiệp, Chứng chỉ SSL. Khi sự cố xảy ra vào ban đêm, doanh nghiệp đối mặt với 4 nỗi đau lớn: <em>Mù mờ danh mục tài sản số, phát hiện chậm, định tuyến sai nhà cung cấp, và MTTR kéo dài do thiếu bằng chứng kỹ thuật.</em>
+        </p>
+
+        <h4 style="color:var(--lp-text-primary); margin-top:16px; margin-bottom:8px;">2. Các Phân Hệ Cốt Lõi (In-Scope)</h4>
+        <ul style="padding-left:20px; margin-bottom:12px;">
+          <li><strong>Quản lý Tài sản số &amp; Giám sát Đa tầng:</strong> Quản lý danh mục Domain, DNS, Web Hosting, Email, SSL kèm Dependency Map.</li>
+          <li><strong>Động cơ Phân tích Sự cố &amp; Soạn Ticket:</strong> Cơ chế chống báo động giả bằng 3-Resolver Quorum; phân loại Root Cause chính xác; tự tạo bản thảo Ticket chuẩn TS/SA.</li>
+          <li><strong>Xác thực Phục hồi:</strong> Kiểm tra 3 lần pass liên tiếp từ nhiều zone để tự động đóng sự cố và xuất báo cáo Post-Mortem.</li>
+          <li><strong>Sổ tay Ứng cứu Khẩn cấp (Playbook):</strong> Kích hoạt checklist cấp cứu, hỗ trợ trang bảo trì tĩnh và kênh ngoài luồng.</li>
+          <li><strong>Phòng Thí Nghiệm Chaos:</strong> Nút giả lập sự cố (DNS SERVFAIL / HTTP 503) phục vụ kiểm chứng workflow của Ban Giám Khảo.</li>
+        </ul>
+
+        <h4 style="color:var(--lp-text-primary); margin-top:16px; margin-bottom:8px;">3. Tích Hợp Trí Tuệ Nhân Tạo (AI SRE Copilot)</h4>
+        <p>
+          Hệ thống kết nối Google Gemini API với prompt kỹ thuật chuyên sâu, phân tích telemetry thô trong 1.1s để trích xuất nguyên nhân gốc, ranh giới ảnh hưởng, và soạn sẵn lệnh shell khắc phục.
+        </p>
+      </div>
+      <div style="padding: 14px 24px; border-top: 1px solid var(--lp-border); display: flex; justify-content: flex-end; gap: 10px; background: var(--lp-surface-subtle);">
+        <button class="lp-btn lp-btn-secondary" onclick="ServiceWatch.closeModal('whitepaperModal')">Đóng</button>
+        <a href="/dashboard" class="lp-btn lp-btn-primary">Trực Tiếp Xem Trong Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="landing.js?v=8"></script>
 </body>
 </html>
