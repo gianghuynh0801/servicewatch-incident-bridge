@@ -1,3 +1,26 @@
+// Auto-bootstrap --experimental-sqlite flag if started via plain "node server.js" on Node 22
+if (!process.env.__SQLITE_BOOTSTRAPPED__) {
+  try {
+    require('node:sqlite');
+  } catch (err) {
+    const { spawn } = require('child_process');
+    console.log('[Bootstrap] Re-launching Node with --experimental-sqlite flag...');
+    const child = spawn(process.execPath, ['--experimental-sqlite', ...process.argv.slice(1)], {
+      stdio: 'inherit',
+      env: { ...process.env, __SQLITE_BOOTSTRAPPED__: '1' }
+    });
+    child.on('exit', (code, signal) => {
+      process.exit(code ?? (signal ? 1 : 0));
+    });
+    ['SIGINT', 'SIGTERM', 'SIGHUP'].forEach(sig => {
+      process.on(sig, () => {
+        try { child.kill(sig); } catch (_) {}
+      });
+    });
+    return;
+  }
+}
+
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
@@ -27,6 +50,14 @@ const PORT = process.env.PORT || 4100;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Cloud & Container Health Checks (Vibe Host / Kubernetes / Nixpacks)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', uptime: process.uptime(), timestamp: new Date().toISOString() });
+});
+app.get('/healthz', (req, res) => {
+  res.status(200).send('OK');
+});
 
 // Explicit page routes
 app.get('/dashboard', (req, res) => {

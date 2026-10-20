@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js",
-    "worker": "node -e \"require('./engine').runProbeCycle().then(() => console.log('Probe worker executed successfully'))\"",
-    "heartbeat:check": "node -e \"require('./engine').evaluateHeartbeats(); console.log('Heartbeat audit completed')\"",
-    "cron": "node server.js",
-    "test": "node test-workflow.js"
+    "start": "node --experimental-sqlite server.js",
+    "dev": "node --experimental-sqlite server.js",
+    "worker": "node --experimental-sqlite -e \"require('./engine').runProbeCycle().then(() => console.log('Probe worker executed successfully'))\"",
+    "heartbeat:check": "node --experimental-sqlite -e \"require('./engine').evaluateHeartbeats(); console.log('Heartbeat audit completed')\"",
+    "cron": "node --experimental-sqlite server.js",
+    "test": "node --experimental-sqlite test-workflow.js"
   },
   "keywords": [
     "sre",
