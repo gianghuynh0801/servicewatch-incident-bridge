@@ -1,13 +1,13 @@
 # TÀI LIỆU YÊU CẦU SẢN PHẨM (PRD)
-# ServiceWatch · Digital Infrastructure Incident Bridge
+# ServiceWatch · Quản Lý Tài Sản Số & Điều Phối Xử Lý Sự Cố
 
 ---
 
 ## 1. TỔNG QUAN Ý TƯỞNG & ĐỊNH VỊ SẢN PHẨM
 
-* **Tên sản phẩm:** ServiceWatch (Incident Bridge)
-* **Khẩu hiệu (Tagline):** Nền tảng tự động điều phối & cầu nối xử lý sự cố hạ tầng số (Tên miền, DNS, Web Hosting, Email, SSL).
-* **Định vị:** Phát hiện sớm sự cố hạ tầng số, đối chiếu đa tầng khử báo động giả, tự động xác định nguyên nhân gốc rễ và kết nối đúng nhà cung cấp để xử lý nhanh nhất.
+* **Tên sản phẩm:** ServiceWatch - Quản Lý Tài Sản Số & Điều Phối Xử Lý Sự Cố
+* **Khẩu hiệu (Tagline):** Nền tảng quản lý bản đồ tài sản số và tự động điều phối xử lý sự cố (Tên miền, DNS, Web Hosting, Email, SSL).
+* **Định vị:** Quản lý tập trung bản đồ phụ thuộc tài sản số, phát hiện sớm sự cố, đối chiếu đa tầng khử báo động giả và tự động kết nối đúng nhà cung cấp để xử lý nhanh nhất.
 
 ---
 
