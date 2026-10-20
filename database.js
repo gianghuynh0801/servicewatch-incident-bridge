@@ -1,8 +1,27 @@
-const Database = require('better-sqlite3');
 const path = require('path');
-
 const dbPath = path.join(__dirname, 'servicewatch.db');
-const db = new Database(dbPath);
+
+let db;
+try {
+  // 1. Prefer Node 22 built-in node:sqlite (100% cloud native, zero C++ build, no Python/node-gyp needed)
+  const { DatabaseSync } = require('node:sqlite');
+  const dbSync = new DatabaseSync(dbPath);
+  dbSync.pragma = function(str) {
+    try {
+      dbSync.exec('PRAGMA ' + str);
+    } catch (e) {}
+  };
+  db = dbSync;
+} catch (e) {
+  // 2. Fallback to better-sqlite3 if on older Node or local dev
+  try {
+    const BetterSqlite = require('better-sqlite3');
+    db = new BetterSqlite(dbPath);
+  } catch (err2) {
+    console.error('Không thể khởi tạo cơ sở dữ liệu SQLite:', err2.message);
+    throw err2;
+  }
+}
 
 // Enable foreign keys and WAL mode for high performance
 db.pragma('journal_mode = WAL');

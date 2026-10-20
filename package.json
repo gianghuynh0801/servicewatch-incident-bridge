@@ -22,7 +22,6 @@
   "license": "MIT",
   "description": "Nền tảng tự động điều phối & cầu nối xử lý sự cố hạ tầng số đa tầng",
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
     "express": "^5.2.1"
   }
 }
